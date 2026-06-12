@@ -21,6 +21,7 @@ class DigestState(TypedDict, total=False):
     run_id: str
     run_date: str
     scraper_output_dir: str
+    skip_scrape: bool
 
     # Pipeline data (accumulated via operator.add)
     articles_raw: Annotated[list[dict], operator.add]

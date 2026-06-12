@@ -42,18 +42,19 @@ def ingest_articles(state: dict) -> dict:
     run_date = state.get("run_date", get_today_str())
     scraper_dir = Path(state.get("scraper_output_dir", "../")).resolve()
     run_id = state.get("run_id", generate_run_id(run_date))
+    skip_scrape = state.get("skip_scrape", False)
 
-    log.info("ingestion_start", run_id=run_id, run_date=run_date, scraper_dir=str(scraper_dir))
+    log.info("ingestion_start", run_id=run_id, run_date=run_date, scraper_dir=str(scraper_dir), skip_scrape=skip_scrape)
 
     # Check if the scraper output already exists
     scraper_file = scraper_dir / f"scraped_articles_{run_date}.json"
     matches = list(scraper_dir.glob(f"scraped_articles_{run_date}*.json"))
     
-    if not scraper_file.exists() and not matches:
-        # Automatically run the scraper first
+    # Automatically run the scraper first unless skip_scrape is True AND the file already exists
+    if not skip_scrape or (not scraper_file.exists() and not matches):
         scraper_script = scraper_dir / "scraper_test.py"
         if scraper_script.exists():
-            log.info("auto_running_scraper", script=str(scraper_script), tier=3)
+            log.info("auto_running_scraper", script=str(scraper_script), tier=3, date=run_date)
             print(f"\n=============================================================")
             print(f"  [Auto] Starting UPSC News Scraper (Tier 3)...")
             print(f"  This crawls all RSS/listing feeds. Please wait.")
@@ -62,8 +63,12 @@ def ingest_articles(state: dict) -> dict:
                 import subprocess
                 import sys
                 
+                cmd = [sys.executable, str(scraper_script)]
+                if run_date:
+                    cmd.extend(["--date", run_date])
+
                 result = subprocess.run(
-                    [sys.executable, str(scraper_script)],
+                    cmd,
                     cwd=str(scraper_dir),
                 )
                 if result.returncode != 0:

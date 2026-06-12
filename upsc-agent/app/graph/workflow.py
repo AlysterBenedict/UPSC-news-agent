@@ -91,6 +91,7 @@ def run_workflow(
     checkpoint_db_path: str | None = None,
     run_id: str | None = None,
     skip_delivery: bool = False,
+    skip_scrape: bool = False,
 ) -> dict:
     """
     Execute the full digest pipeline.
@@ -101,19 +102,21 @@ def run_workflow(
         checkpoint_db_path: SQLite path for checkpointing
         run_id: Optional run ID (auto-generated if None)
         skip_delivery: If True, do not send PDF via email
+        skip_scrape: If True, skip running the scraper and use cached file
     """
     from app.agents.ingestion import generate_run_id
 
     if not run_id:
         run_id = generate_run_id(run_date)
 
-    log.info("workflow_start", run_id=run_id, run_date=run_date, skip_delivery=skip_delivery)
+    log.info("workflow_start", run_id=run_id, run_date=run_date, skip_delivery=skip_delivery, skip_scrape=skip_scrape)
 
     # Initial state
     initial_state: dict = {
         "run_id": run_id,
         "run_date": run_date,
         "scraper_output_dir": scraper_output_dir,
+        "skip_scrape": skip_scrape,
         "articles_raw": [],
         "articles_normalized": [],
         "article_clusters": [],

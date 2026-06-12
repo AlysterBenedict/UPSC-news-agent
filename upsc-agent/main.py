@@ -75,6 +75,7 @@ def cmd_run(args):
             checkpoint_db_path=db_path,
             run_id=args.run_id,
             skip_delivery=skip_delivery,
+            skip_scrape=args.skip_scrape,
         )
 
         elapsed = time.time() - start
@@ -200,6 +201,7 @@ def main():
     run_parser.add_argument("--run-id", help="Custom run ID")
     run_parser.add_argument("--local-only", action="store_true", help="Save PDF locally only (do not send email)")
     run_parser.add_argument("--send-email", action="store_true", help="Send PDF via email (skip prompt)")
+    run_parser.add_argument("--skip-scrape", action="store_true", help="Skip running the scraper and use existing JSON file")
 
     # schedule
     subparsers.add_parser("schedule", help="Start daily scheduler")
