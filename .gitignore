@@ -1,0 +1,27 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environments
+.venv/
+venv/
+ENV/
+env/
+
+# IDEs and editors
+.vscode/
+.idea/
+
+# UPSC agent specific files
+upsc-agent/.env
+api key.txt
+upsc-agent/data/
+upsc-agent/output/
+upsc-agent/.pytest_cache/
+.pytest_cache/
+
+# Scraper output artifacts
+scraped_articles_*.json
+scrape_report_*.txt
+*.log

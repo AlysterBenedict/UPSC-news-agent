@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UPSC Daily Newspaper Digest — {{ run_date }}</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+        /* ===== PAGE SETUP ===== */
+        @page {
+            size: A4;
+            margin: 1.5cm 1.5cm 2cm 1.5cm;
+
+            @top-center {
+                content: "UPSC Daily Digest — {{ run_date }}";
+                font-size: 7.5pt;
+                color: #888;
+                font-family: 'Inter', 'Helvetica Neue', 'Arial', sans-serif;
+            }
+            @bottom-center {
+                content: "Page " counter(page) " of " counter(pages);
+                font-size: 7.5pt;
+                color: #888;
+                font-family: 'Inter', 'Helvetica Neue', 'Arial', sans-serif;
+            }
+            @bottom-right {
+                content: "UPSC Digest AI";
+                font-size: 7pt;
+                color: #aaa;
+                font-family: 'Inter', 'Helvetica Neue', 'Arial', sans-serif;
+            }
+        }
+
+        @page :first {
+            @top-center { content: none; }
+            @bottom-center { content: none; }
+            @bottom-right { content: none; }
+        }
+
+        /* ===== TYPOGRAPHY ===== */
+        body {
+            font-family: 'Inter', 'Helvetica Neue', 'Arial', sans-serif;
+            font-size: 9.5pt;
+            line-height: 1.45;
+            color: #1a1a1a;
+        }
+
+        h1 {
+            font-size: 26pt;
+            color: #1a237e;
+            margin-bottom: 4px;
+            letter-spacing: -0.5px;
+        }
+
+        h2 {
+            font-size: 14pt;
+            color: #1a237e;
+            border-bottom: 2.5px solid #1a237e;
+            padding-bottom: 3px;
+            margin-top: 14px;
+            margin-bottom: 8px;
+            page-break-after: avoid;
+        }
+
+        h3 {
+            font-size: 10.5pt;
+            color: #1a237e;
+            margin-top: 14px;
+            margin-bottom: 3px;
+            page-break-after: avoid;
+            font-weight: 700;
+            padding-top: 8px;
+            border-top: 1px solid #e8e8e8;
+        }
+
+        /* First h3 in a section should not have a top border */
+        .section-title + h3,
+        .digest-section > h3:first-of-type {
+            border-top: none;
+            padding-top: 0;
+            margin-top: 8px;
+        }
+
+        h4 {
+            font-size: 9.5pt;
+            color: #303f9f;
+            margin-top: 6px;
+            margin-bottom: 2px;
+            page-break-after: avoid;
+        }
+
+        p {
+            margin: 3px 0;
+        }
+
+        strong {
+            color: #1a237e;
+        }
+
+        /* ===== COVER PAGE ===== */
+        .cover {
+            text-align: center;
+            page-break-after: always;
+            padding-top: 12%;
+        }
+
+        .cover-title {
+            font-size: 30pt;
+            color: #0d1b6e;
+            margin-bottom: 4px;
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+
+        .cover-subtitle {
+            font-size: 13pt;
+            color: #455a64;
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+
+        .cover-date {
+            font-size: 18pt;
+            color: #37474f;
+            margin: 14px 0;
+            font-weight: 600;
+        }
+
+        .cover-stats {
+            margin: 20px auto;
+            max-width: 380px;
+            border-collapse: collapse;
+        }
+
+        .cover-stats td {
+            padding: 5px 14px;
+            font-size: 10pt;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .cover-stats td:first-child {
+            color: #666;
+            text-align: right;
+        }
+
+        .cover-stats td:last-child {
+            color: #1a237e;
+            font-weight: 600;
+            text-align: left;
+        }
+
+        .cover-themes {
+            margin: 20px auto;
+            max-width: 500px;
+            text-align: left;
+        }
+
+        .cover-themes h3 {
+            text-align: center;
+            color: #37474f;
+            border-bottom: 1px solid #ccc;
+            border-top: none;
+            padding-bottom: 4px;
+            padding-top: 0;
+            font-size: 11pt;
+        }
+
+        .cover-themes li {
+            font-size: 9.5pt;
+            margin: 3px 0;
+            color: #333;
+        }
+
+        .cover-line {
+            width: 60%;
+            border: none;
+            border-top: 3px solid #1a237e;
+            margin: 16px auto;
+        }
+
+        /* ===== TABLE OF CONTENTS ===== */
+        .toc {
+            page-break-after: always;
+        }
+
+        .toc h2 {
+            text-align: center;
+            border-bottom: none;
+        }
+
+        .toc ol {
+            list-style: decimal;
+            padding-left: 24px;
+            max-width: 460px;
+            margin: 12px auto;
+        }
+
+        .toc li {
+            margin: 5px 0;
+            font-size: 10.5pt;
+        }
+
+        .toc a {
+            color: #1a237e;
+            text-decoration: none;
+        }
+
+        .toc a:hover {
+            text-decoration: underline;
+        }
+
+        .toc .toc-wc {
+            float: right;
+            color: #999;
+            font-size: 8pt;
+        }
+
+        /* ===== SECTIONS ===== */
+        .digest-section {
+            page-break-before: always;
+        }
+
+        .section-title {
+            color: #0d1b6e;
+            font-size: 15pt;
+            border-bottom: 3px solid #1a237e;
+            padding-bottom: 4px;
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+
+        /* ===== GS TAG LINE — Article footer tag ===== */
+        .gs-tag {
+            font-size: 8.5pt;
+            color: #444;
+            margin-top: 3px;
+            margin-bottom: 14px;
+            padding: 5px 8px;
+            background: #f0f2f8;
+            border-left: 3px solid #1a237e;
+            line-height: 1.35;
+        }
+
+        .gs-tag strong {
+            color: #283593;
+            font-size: 8.5pt;
+        }
+
+        /* ===== CALLOUT BOXES (legacy support) ===== */
+        .prelims-box {
+            background: #e8f5e9;
+            border-left: 4px solid #2e7d32;
+            padding: 8px 12px;
+            margin: 8px 0;
+            font-size: 9pt;
+            page-break-inside: avoid;
+        }
+
+        .mains-box {
+            background: #e3f2fd;
+            border-left: 4px solid #1565c0;
+            padding: 8px 12px;
+            margin: 8px 0;
+            font-size: 9pt;
+            page-break-inside: avoid;
+        }
+
+        .editorial-analysis {
+            background: #fff8e1;
+            border-left: 4px solid #f57f17;
+            padding: 8px 12px;
+            margin: 8px 0;
+            font-size: 9pt;
+            page-break-inside: avoid;
+        }
+
+        .fact-card {
+            background: #f3e5f5;
+            border: 1px solid #ce93d8;
+            padding: 6px 10px;
+            margin: 4px 0;
+            border-radius: 3px;
+            font-size: 9pt;
+            page-break-inside: avoid;
+        }
+
+        .answer-framework {
+            background: #fce4ec;
+            border-left: 4px solid #c62828;
+            padding: 8px 12px;
+            margin: 8px 0;
+            font-size: 9pt;
+            page-break-inside: avoid;
+        }
+
+        /* ===== SOURCE REFERENCES ===== */
+        .source-ref {
+            font-size: 8pt;
+            color: #757575;
+            font-style: italic;
+            margin-top: 4px;
+            padding-top: 3px;
+            border-top: 1px dotted #ccc;
+        }
+
+        /* ===== TABLES ===== */
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 6px 0;
+            font-size: 8.5pt;
+        }
+
+        th {
+            background: #1a237e;
+            color: white;
+            padding: 5px 8px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 8pt;
+        }
+
+        td {
+            padding: 3px 6px;
+            border-bottom: 1px solid #e0e0e0;
+            vertical-align: top;
+        }
+
+        tr {
+            page-break-inside: avoid;
+        }
+
+        tr:nth-child(even) {
+            background: #f5f5f5;
+        }
+
+        /* ===== LISTS ===== */
+        ul, ol {
+            margin: 4px 0;
+            padding-left: 18px;
+        }
+
+        li {
+            margin: 2px 0;
+        }
+
+        /* ===== SOURCE APPENDIX ===== */
+        .source-appendix {
+            page-break-before: always;
+            font-size: 9pt;
+            color: #555;
+        }
+
+        .source-appendix h2 {
+            font-size: 13pt;
+        }
+
+        /* ===== BRIEF CARD LAYOUT ===== */
+        .brief-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 12px 14px;
+            margin-top: 14px;
+            margin-bottom: 18px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+            page-break-inside: avoid;
+        }
+
+        .brief-card h3 {
+            margin-top: 0;
+            padding-top: 0;
+            border-top: none;
+            font-size: 11pt;
+            color: #1a237e;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .meta-row {
+            font-size: 8pt;
+            color: #555;
+            margin-bottom: 8px;
+            padding-bottom: 4px;
+            border-bottom: 1px solid #f0f4f8;
+            line-height: 1.5;
+        }
+
+        .source-tag {
+            background: #e1f5fe;
+            color: #0288d1;
+            padding: 1px 5px;
+            border-radius: 3px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .syllabus-tag {
+            background: #ede7f6;
+            color: #5e35b1;
+            padding: 1px 5px;
+            border-radius: 3px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .static-tag {
+            background: #fff3e0;
+            color: #e65100;
+            padding: 1px 5px;
+            border-radius: 3px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        /* ===== PRELIMS METADATA CARD ===== */
+        .prelims-metadata-card {
+            background: #f1f8e9;
+            border: 1px solid #c5e1a5;
+            border-radius: 4px;
+            padding: 6px 10px;
+            margin: 6px 0;
+            font-size: 8.5pt;
+        }
+
+        .prelims-metadata-card table {
+            margin: 0;
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .prelims-metadata-card tr {
+            background: transparent !important;
+        }
+
+        .prelims-metadata-card td {
+            padding: 2px 4px;
+            border: none;
+            font-size: 8.5pt;
+        }
+
+        .prelims-metadata-card td.lbl {
+            font-weight: 700;
+            color: #33691e;
+            width: 25%;
+        }
+
+        /* ===== MAINS SPLIT TABLE ===== */
+        table.mains-split-table {
+            width: 100%;
+            margin: 8px 0;
+            border-collapse: separate;
+            border-spacing: 6px 0;
+        }
+
+        table.mains-split-table tr {
+            background: transparent !important;
+        }
+
+        table.mains-split-table td {
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            padding: 8px 10px;
+            width: 50%;
+            vertical-align: top;
+            font-size: 8.5pt;
+        }
+
+        table.mains-split-table td.mains-col-pros {
+            background: #f1f8e9;
+            border-color: #d0e7b9;
+        }
+
+        table.mains-split-table td.mains-col-pros strong {
+            color: #33691e;
+        }
+
+        table.mains-split-table td.mains-col-cons {
+            background: #ffebee;
+            border-color: #ffcdd2;
+        }
+
+        table.mains-split-table td.mains-col-cons strong {
+            color: #b71c1c;
+        }
+
+        table.mains-split-table ul {
+            margin: 4px 0 0 0;
+            padding-left: 14px;
+        }
+
+        table.mains-split-table li {
+            margin: 2px 0;
+        }
+
+        /* ===== WAY FORWARD BOX ===== */
+        .way-forward-box {
+            background: #e0f7fa;
+            border-left: 4px solid #00acc1;
+            padding: 6px 10px;
+            margin: 6px 0;
+            font-size: 8.5pt;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .way-forward-box strong {
+            color: #006064;
+        }
+
+        /* ===== COLOR-CODED THEME OVERRIDES ===== */
+        
+        /* GS1: Society & Geography (Terracotta Red / Maroon) */
+        #gs1_society .section-title {
+            color: #b71c1c;
+            border-bottom-color: #b71c1c;
+        }
+        #gs1_society .brief-card {
+            border-left: 3px solid #b71c1c;
+        }
+        #gs1_society .brief-card h3 {
+            color: #b71c1c;
+        }
+        #gs1_society .syllabus-tag {
+            background: #ffebee;
+            color: #b71c1c;
+        }
+
+        /* GS2: Polity & IR (Royal Navy Blue) */
+        #gs2_polity .section-title, #gs2_ir .section-title {
+            color: #1a237e;
+            border-bottom-color: #1a237e;
+        }
+        #gs2_polity .brief-card, #gs2_ir .brief-card {
+            border-left: 3px solid #1a237e;
+        }
+        #gs2_polity .brief-card h3, #gs2_ir .brief-card h3 {
+            color: #1a237e;
+        }
+        #gs2_polity .syllabus-tag, #gs2_ir .syllabus-tag {
+            background: #e8eaf6;
+            color: #1a237e;
+        }
+
+        /* GS3: Economy, Environment, Sci-Tech (Forest/Hunter Green) */
+        #gs3_economy .section-title, #gs3_environment .section-title, #gs3_scitech .section-title {
+            color: #1b5e20;
+            border-bottom-color: #1b5e20;
+        }
+        #gs3_economy .brief-card, #gs3_environment .brief-card, #gs3_scitech .brief-card {
+            border-left: 3px solid #1b5e20;
+        }
+        #gs3_economy .brief-card h3, #gs3_environment .brief-card h3, #gs3_scitech .brief-card h3 {
+            color: #1b5e20;
+        }
+        #gs3_economy .syllabus-tag, #gs3_environment .syllabus-tag, #gs3_scitech .syllabus-tag {
+            background: #e8f5e9;
+            color: #1b5e20;
+        }
+
+        /* Editorials & Explained (Deep Amber / Gold) */
+        #editorial .section-title {
+            color: #e65100;
+            border-bottom-color: #e65100;
+        }
+        #editorial .brief-card {
+            border-left: 3px solid #e65100;
+        }
+        #editorial .brief-card h3 {
+            color: #e65100;
+        }
+        #editorial .syllabus-tag {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        /* PIB (Purple / Indigo) */
+        #pib .section-title {
+            color: #4a148c;
+            border-bottom-color: #4a148c;
+        }
+        #pib .brief-card {
+            border-left: 3px solid #4a148c;
+        }
+        #pib .brief-card h3 {
+            color: #4a148c;
+        }
+        #pib .syllabus-tag {
+            background: #f3e5f5;
+            color: #4a148c;
+        }
+
+        /* ===== REVISION TABLE (Cheat Sheet) ===== */
+        #revision_table table {
+            font-size: 7.5pt;
+            line-height: 1.3;
+        }
+
+        #revision_table th {
+            background: #283593;
+            font-size: 7.5pt;
+            padding: 4px 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        #revision_table td {
+            padding: 3px 5px;
+            font-size: 7.5pt;
+            border-bottom: 1px solid #e8e8e8;
+        }
+
+        #revision_table tr:nth-child(even) {
+            background: #fafafa;
+        }
+
+        #revision_table a {
+            color: #1a237e;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        #revision_table ul {
+            margin: 1px 0;
+            padding-left: 12px;
+        }
+
+        #revision_table li {
+            margin: 0;
+            font-size: 7pt;
+        }
+
+        .revision-section-header td {
+            background: #e8eaf6 !important;
+            color: #1a237e;
+            font-size: 8pt;
+            padding: 4px 6px;
+            border-bottom: 2px solid #3949ab;
+            border-top: 1px solid #c5cae9;
+        }
+
+        /* ===== PRINT HELPERS ===== */
+        .page-break {
+            page-break-after: always;
+        }
+
+        .no-break {
+            page-break-inside: avoid;
+        }
+    </style>
+</head>
+<body>
+    <!-- COVER PAGE -->
+    <div class="cover">
+        <h1 class="cover-title">UPSC Daily Newspaper Digest</h1>
+        <p class="cover-subtitle">Comprehensive Current Affairs for UPSC Preparation</p>
+        <hr class="cover-line">
+        <p class="cover-date">{{ formatted_date }}</p>
+
+        <table class="cover-stats">
+            <tr><td>Articles Analyzed</td><td>{{ total_articles }}</td></tr>
+            <tr><td>Unique Stories</td><td>{{ total_verified }}</td></tr>
+            <tr><td>Total Words</td><td>{{ "{:,}".format(total_words) }}</td></tr>
+        </table>
+
+        <div class="cover-themes">
+            <h3>Key Themes Today</h3>
+            <ul>
+            {% for theme in themes %}
+                <li>{{ theme }}</li>
+            {% endfor %}
+            </ul>
+        </div>
+
+        <p style="font-size: 8pt; color: #999; margin-top: 24px;">
+            Sources: {{ sources | join(', ') }}<br>
+            Generated: {{ generated_at }}
+        </p>
+    </div>
+
+    <!-- TABLE OF CONTENTS -->
+    <div class="toc">
+        <h2>Table of Contents</h2>
+        <ol>
+        {% for entry in toc_entries %}
+            <li>
+                <a href="#{{ entry.anchor }}">{{ entry.name }}</a>
+                <span class="toc-wc">~{{ entry.word_count }} words</span>
+            </li>
+        {% endfor %}
+        </ol>
+    </div>
+
+    <!-- SECTIONS -->
+    {% for section in sections %}
+    <section id="{{ section.anchor }}" class="digest-section">
+        <h2 class="section-title">{{ section.name }}</h2>
+        {{ section.content | safe }}
+    </section>
+    {% endfor %}
+
+    <!-- SOURCE APPENDIX -->
+    <section class="source-appendix">
+        <h2>Source References & Methodology</h2>
+        <p>This digest was compiled from <strong>{{ total_articles }}</strong> articles
+        across the following sources: {{ sources | join(', ') }}.</p>
+        <p><strong>Methodology:</strong> Each article was individually analyzed for UPSC relevance,
+        deduplicated via semantic clustering, verified against source text, and then written
+        into section-wise briefs. Only verified content was included.</p>
+        <p><strong>Generated:</strong> {{ generated_at }} | Run ID: {{ run_id }}</p>
+    </section>
+</body>
+</html>

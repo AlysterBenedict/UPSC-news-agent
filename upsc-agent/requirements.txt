@@ -1,0 +1,38 @@
+# UPSC Daily Digest - Multi-Agent Pipeline
+# Core orchestration
+langgraph>=0.4
+langgraph-checkpoint-sqlite>=3.0
+langchain-core>=0.3
+langchain-openai>=0.3
+
+# LLM client
+openai>=1.60
+
+# Schema validation
+pydantic>=2.10
+pydantic-settings>=2.7
+
+# HTML/PDF
+jinja2>=3.1
+weasyprint>=63
+
+# Embeddings & clustering
+sentence-transformers>=3.4
+scikit-learn>=1.6
+numpy>=1.26
+
+# Scheduling
+apscheduler>=3.11
+
+# Logging
+structlog>=25.1
+
+# Config
+python-dotenv>=1.0
+
+# Testing
+pytest>=8.0
+pytest-asyncio>=0.24
+
+# Already in env (from scraper)
+# requests, beautifulsoup4, feedparser, playwright
