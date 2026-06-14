@@ -15,9 +15,9 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 import re
 
-from app.agents.write_sections import SECTION_CONFIG
-from app.utils.logging import get_logger
-from app.utils.text import word_count, estimate_pages
+from app.agents.write_sections_app import SECTION_CONFIG
+from app.utils.logging_app import get_logger
+from app.utils.text_app import word_count, estimate_pages
 
 log = get_logger(__name__)
 
@@ -227,7 +227,7 @@ def assemble_document(state: dict) -> dict:
 
     # Render the complete document
     try:
-        template = env.get_template("base.html")
+        template = env.get_template("base_app.html")
         compiled_html = template.render(
             run_date=run_date,
             formatted_date=datetime.strptime(run_date, "%Y-%m-%d").strftime("%d %B %Y") if run_date else "",
@@ -259,7 +259,7 @@ def assemble_document(state: dict) -> dict:
         log.warning("assembled_html_validation_failed", error=str(e))
 
     # Save compiled HTML
-    from config.settings import get_settings
+    from app.services.settings_app import get_settings
     settings = get_settings()
     output_dir = settings.run_dir(run_id)
     html_path = output_dir / "compiled_digest.html"

@@ -11,11 +11,11 @@ import uuid
 from datetime import datetime
 from pathlib import Path
 
-from app.models.schemas import RawArticle, ErrorRecord
-from app.utils.dates import get_today_str
-from app.utils.files import read_json
-from app.utils.logging import get_logger
-from app.agents.normalize import parse_source_name
+from app.models.schemas_app import RawArticle, ErrorRecord
+from app.utils.dates_app import get_today_str
+from app.utils.files_app import read_json
+from app.utils.logging_app import get_logger
+from app.agents.normalize_app import parse_source_name
 
 log = get_logger(__name__)
 
@@ -52,11 +52,24 @@ def ingest_articles(state: dict) -> dict:
     
     # Automatically run the scraper first unless skip_scrape is True AND the file already exists
     if not skip_scrape or (not scraper_file.exists() and not matches):
+        import sys
+        bundle_dir = getattr(sys, '_MEIPASS', None)
+        is_frozen = getattr(sys, 'frozen', False)
         scraper_script = scraper_dir / "scraper_test.py"
         if not scraper_script.exists() and (scraper_dir.parent / "scraper_test.py").exists():
             scraper_script = scraper_dir.parent / "scraper_test.py"
             
+        can_run = False
         if scraper_script.exists():
+            can_run = True
+        elif bundle_dir and (Path(bundle_dir) / "scraper_test.py").exists():
+            scraper_script = Path(bundle_dir) / "scraper_test.py"
+            can_run = True
+        elif is_frozen:
+            # In compiled EXE mode, we intercept "scraper_test.py" in sys.argv, so a physical file check isn't required.
+            can_run = True
+
+        if can_run:
             log.info("auto_running_scraper", script=str(scraper_script), tier=3, date=run_date)
             print(f"\n=============================================================")
             print(f"  [Auto] Starting UPSC News Scraper (Tier 3)...")
@@ -70,13 +83,30 @@ def ingest_articles(state: dict) -> dict:
                 if run_date:
                     cmd.extend(["--date", run_date])
 
-                result = subprocess.run(
+                process = subprocess.Popen(
                     cmd,
                     cwd=str(scraper_dir),
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT,
+                    text=True,
+                    bufsize=1,
+                    encoding="utf-8",
+                    errors="replace"
                 )
-                if result.returncode != 0:
-                    log.error("scraper_run_failed", returncode=result.returncode)
-                    print(f"\n[WARN] Scraper exited with code {result.returncode}. Proceeding with pipeline...")
+                
+                # Stream the scraper output to sys.stdout in real-time
+                while True:
+                    line = process.stdout.readline()
+                    if not line and process.poll() is not None:
+                        break
+                    if line:
+                        sys.stdout.write(line)
+                        sys.stdout.flush()
+                
+                returncode = process.poll()
+                if returncode != 0:
+                    log.error("scraper_run_failed", returncode=returncode)
+                    print(f"\n[WARN] Scraper exited with code {returncode}. Proceeding with pipeline...")
                 else:
                     log.info("scraper_run_success")
                     print(f"\n[OK] Scraper finished successfully!\n")

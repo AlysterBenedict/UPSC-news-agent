@@ -25,3 +25,6 @@ upsc-agent/.pytest_cache/
 scraped_articles_*.json
 scrape_report_*.txt
 *.log
+zartifacts/
+upsc-app/dist/
+upsc-app/build/

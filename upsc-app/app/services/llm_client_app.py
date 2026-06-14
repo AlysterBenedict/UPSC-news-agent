@@ -13,7 +13,7 @@ from typing import Any, Optional
 
 from openai import OpenAI
 
-from app.utils.logging import get_logger
+from app.utils.logging_app import get_logger
 
 log = get_logger(__name__)
 

@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UPSC Digest Agent</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <!-- Lucide Icons CDN for proper icon usage instead of emojis -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="style_app.css">
+</head>
+<body>
+    <!-- Background visual effects -->
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+    <div class="bg-grid"></div>
+
+    <!-- Toast notification container -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <div class="app-container">
+        <!-- HEADER -->
+        <header class="app-header">
+            <div class="logo-group">
+                <div class="logo-icon-wrapper">
+                    <img src="icon.ico" alt="App Icon" style="width: 20px; height: 20px; object-fit: contain;">
+                </div>
+                <div class="logo-text">
+                    <h1>UPSC Digest <span class="badge">AI</span></h1>
+                </div>
+            </div>
+            <div class="status-indicator-bar" id="appStatus">
+                <span class="status-dot"></span>
+                <span class="status-text">Disconnected</span>
+            </div>
+        </header>
+
+        <main class="app-content">
+            <!-- INTRO SECTION -->
+            <div class="intro-header" id="introHeader">
+                <div class="feature-tag">
+                    <i data-lucide="cpu" style="width:12px;height:12px;vertical-align:-2px;margin-right:4px;"></i>
+                    MULTI-AGENT PIPELINE
+                </div>
+                <h2 class="main-title">Daily UPSC News Digest <br><span class="highlight-text">AI Generator</span></h2>
+                <p class="main-subtitle">A sophisticated multi-agent pipeline that crawls RSS feeds, clusters key articles, and utilizes Llama-3.3-Nemotron to compile daily current affairs analyses for UPSC preparation.</p>
+            </div>
+
+            <!-- SECTION 1: API KEY SETUP -->
+            <section id="apiKeySection" class="card active">
+                <div class="card-icon-container">
+                    <img src="nvidia.png" alt="NVIDIA Logo" style="width: 24px; height: 24px; object-fit: contain;">
+                </div>
+                <div class="card-header">
+                    <h2>NVIDIA NIM Authentication</h2>
+                    <p>Enter your API key to activate the local news aggregator and reasoning models.</p>
+                </div>
+                <div class="form-group">
+                    <label for="apiKeyInput">
+                        <i data-lucide="lock" style="width:11px;height:11px;vertical-align:-1px;margin-right:3px;"></i>
+                        API Key
+                    </label>
+                    <div class="input-with-button">
+                        <input type="password" id="apiKeyInput" placeholder="nvapi-..." autocomplete="off">
+                        <button id="saveKeyBtn" class="btn btn-primary">
+                            <i data-lucide="plug" style="width:16px;height:16px;"></i>
+                            <span>Connect Agent</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="agent-flow-container">
+                    <h3>Pipeline Workflow</h3>
+                    <div class="agent-flow-steps">
+                        <div class="flow-step">
+                            <div class="flow-step-icon"><i data-lucide="rss"></i></div>
+                            <div class="flow-step-info">
+                                <span class="flow-step-title">Scrape & Ingest</span>
+                                <span class="flow-step-agent">scraper_test.py</span>
+                            </div>
+                        </div>
+                        <div class="flow-arrow"><i data-lucide="chevrons-right"></i></div>
+                        <div class="flow-step">
+                            <div class="flow-step-icon"><i data-lucide="file-text"></i></div>
+                            <div class="flow-step-info">
+                                <span class="flow-step-title">Normalization</span>
+                                <span class="flow-step-agent">normalize_app.py</span>
+                            </div>
+                        </div>
+                        <div class="flow-arrow"><i data-lucide="chevrons-right"></i></div>
+                        <div class="flow-step">
+                            <div class="flow-step-icon"><i data-lucide="copy-minus"></i></div>
+                            <div class="flow-step-info">
+                                <span class="flow-step-title">Deduplication</span>
+                                <span class="flow-step-agent">dedup_app.py</span>
+                            </div>
+                        </div>
+                        <div class="flow-arrow"><i data-lucide="chevrons-right"></i></div>
+                        <div class="flow-step">
+                            <div class="flow-step-icon"><i data-lucide="scan-search"></i></div>
+                            <div class="flow-step-info">
+                                <span class="flow-step-title">Verification</span>
+                                <span class="flow-step-agent">verify_app.py</span>
+                            </div>
+                        </div>
+                        <div class="flow-arrow"><i data-lucide="chevrons-right"></i></div>
+                        <div class="flow-step">
+                            <div class="flow-step-icon"><i data-lucide="pen-tool"></i></div>
+                            <div class="flow-step-info">
+                                <span class="flow-step-title">Section Writing</span>
+                                <span class="flow-step-agent">write_sections_app.py</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-tags">
+                    <span class="card-tag"><i data-lucide="brain" style="width:11px;height:11px;vertical-align:-1px;margin-right:3px;"></i>NVIDIA Llama</span>
+                    <span class="card-tag"><i data-lucide="git-branch" style="width:11px;height:11px;vertical-align:-1px;margin-right:3px;"></i>Multi-Agent</span>
+                    <span class="card-tag"><i data-lucide="shield-check" style="width:11px;height:11px;vertical-align:-1px;margin-right:3px;"></i>Encrypted Key</span>
+                </div>
+            </section>
+
+            <!-- SECTION 2: DASHBOARD (DATE PICKER & RUN) -->
+            <section id="dashboardSection" class="card">
+                <div class="dashboard-grid">
+                    <div class="dashboard-left">
+                        <div class="card-icon-container">
+                            <i data-lucide="calendar-days"></i>
+                        </div>
+                        <div class="card-header">
+                            <h2>Generate Daily Digest</h2>
+                            <p>Select a date to trigger the multi-agent scraping and reasoning workflow.</p>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="dateInput">
+                                <i data-lucide="calendar" style="width:11px;height:11px;vertical-align:-1px;margin-right:3px;"></i>
+                                Target Date
+                            </label>
+                            <input type="date" id="dateInput" class="date-picker-input">
+                        </div>
+
+                        <button id="generateBtn" class="btn btn-primary btn-lg btn-glow">
+                            <i data-lucide="play" style="width:18px;height:18px;"></i>
+                            <span class="btn-text">Execute UPSC Pipeline</span>
+                        </button>
+
+                        <div class="agent-flow-container">
+                            <h3>Pipeline Workflow</h3>
+                            <div class="agent-flow-steps">
+                                <div class="flow-step">
+                                    <div class="flow-step-icon"><i data-lucide="rss"></i></div>
+                                    <div class="flow-step-info">
+                                        <span class="flow-step-title">Scrape & Ingest</span>
+                                        <span class="flow-step-agent">scraper_test.py</span>
+                                    </div>
+                                </div>
+                                <div class="flow-arrow"><i data-lucide="chevrons-right"></i></div>
+                                <div class="flow-step">
+                                    <div class="flow-step-icon"><i data-lucide="file-text"></i></div>
+                                    <div class="flow-step-info">
+                                        <span class="flow-step-title">Normalization</span>
+                                        <span class="flow-step-agent">normalize_app.py</span>
+                                    </div>
+                                </div>
+                                <div class="flow-arrow"><i data-lucide="chevrons-right"></i></div>
+                                <div class="flow-step">
+                                    <div class="flow-step-icon"><i data-lucide="copy-minus"></i></div>
+                                    <div class="flow-step-info">
+                                        <span class="flow-step-title">Deduplication</span>
+                                        <span class="flow-step-agent">dedup_app.py</span>
+                                    </div>
+                                </div>
+                                <div class="flow-arrow"><i data-lucide="chevrons-right"></i></div>
+                                <div class="flow-step">
+                                    <div class="flow-step-icon"><i data-lucide="scan-search"></i></div>
+                                    <div class="flow-step-info">
+                                        <span class="flow-step-title">Verification</span>
+                                        <span class="flow-step-agent">verify_app.py</span>
+                                    </div>
+                                </div>
+                                <div class="flow-arrow"><i data-lucide="chevrons-right"></i></div>
+                                <div class="flow-step">
+                                    <div class="flow-step-icon"><i data-lucide="pen-tool"></i></div>
+                                    <div class="flow-step-info">
+                                        <span class="flow-step-title">Section Writing</span>
+                                        <span class="flow-step-agent">write_sections_app.py</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-right">
+                        <div class="connection-status-card">
+                            <h3>
+                                <i data-lucide="server" style="width:14px;height:14px;vertical-align:-2px;margin-right:6px;"></i>
+                                Agent Information
+                            </h3>
+                            <div class="status-row">
+                                <span class="lbl">API Status:</span>
+                                <span class="val text-success">Connected</span>
+                            </div>
+                            <div class="status-row">
+                                <span class="lbl">Active Key:</span>
+                                <span class="val" id="maskedKey">••••••••••••••••</span>
+                            </div>
+                            <div class="status-row">
+                                <span class="lbl">Model:</span>
+                                <span class="val">Llama-3.3-Nemotron</span>
+                            </div>
+                            <button id="deleteKeyBtn" class="btn btn-danger btn-sm">
+                                <i data-lucide="unplug" style="width:13px;height:13px;"></i>
+                                <span>Disconnect / Change Key</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 3: PIPELINE EXECUTION (LOGS & PROGRESS) -->
+            <section id="executionSection" class="card">
+                <div class="execution-layout">
+                    <div class="execution-left">
+                        <div class="scanner-container">
+                            <div class="scanning-circle">
+                                <div class="pulse-ring"></div>
+                                <div class="core-dot"></div>
+                            </div>
+                            <div class="scanning-info">
+                                <h3 id="currentPhaseName">Initializing Ingestion</h3>
+                                <p id="timeElapsed">Time Elapsed: 0s</p>
+                            </div>
+                        </div>
+
+                        <!-- Stepper -->
+                        <ul class="stepper">
+                            <li id="step_ingest" class="step active">
+                                <span class="step-num">
+                                    <i data-lucide="rss" style="width:12px;height:12px;"></i>
+                                </span>
+                                <span class="step-label">Ingesting Articles</span>
+                            </li>
+                            <li id="step_normalize" class="step">
+                                <span class="step-num">
+                                    <i data-lucide="file-text" style="width:12px;height:12px;"></i>
+                                </span>
+                                <span class="step-label">Normalizing Feeds</span>
+                            </li>
+                            <li id="step_dedup" class="step">
+                                <span class="step-num">
+                                    <i data-lucide="copy-minus" style="width:12px;height:12px;"></i>
+                                </span>
+                                <span class="step-label">Deduplicating News</span>
+                            </li>
+                            <li id="step_analyze" class="step">
+                                <span class="step-num">
+                                    <i data-lucide="scan-search" style="width:12px;height:12px;"></i>
+                                </span>
+                                <span class="step-label">Clustering & Verification</span>
+                            </li>
+                            <li id="step_write" class="step">
+                                <span class="step-num">
+                                    <i data-lucide="pen-tool" style="width:12px;height:12px;"></i>
+                                </span>
+                                <span class="step-label">Writing & Mapping</span>
+                            </li>
+                            <li id="step_render" class="step">
+                                <span class="step-num">
+                                    <i data-lucide="file-output" style="width:12px;height:12px;"></i>
+                                </span>
+                                <span class="step-label">Compiling A4 PDF</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="execution-right">
+                        <div class="terminal-header">
+                            <div class="term-title-group">
+                                <div class="terminal-icon">
+                                    <i data-lucide="terminal" style="width:14px;height:14px;"></i>
+                                </div>
+                                <span class="terminal-title">System Console</span>
+                            </div>
+                            <div class="terminal-actions">
+                                <span class="term-dot red"></span>
+                                <span class="term-dot yellow"></span>
+                                <span class="term-dot green"></span>
+                            </div>
+                        </div>
+                        <div id="consoleLog" class="terminal-body">
+                            <div class="log-line system">[SYSTEM] Ready to execute...</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 4: SUCCESS CARD -->
+            <section id="successSection" class="card text-center">
+                <div class="success-animation">
+                    <div class="success-ring"></div>
+                    <div class="success-checkmark">
+                        <i data-lucide="check" style="width:36px;height:36px;stroke-width:3;"></i>
+                    </div>
+                </div>
+                <h2 class="text-glow">Digest Compiled Successfully!</h2>
+                <p class="success-desc">The UPSC Daily Digest has been processed and saved to your local machine.</p>
+                
+                <div class="path-display-box">
+                    <span class="path-label">
+                        <i data-lucide="folder-open" style="width:12px;height:12px;vertical-align:-1px;margin-right:3px;"></i>
+                        File Path:
+                    </span>
+                    <span id="pdfPathText" class="path-val">C:\Users\...\Desktop\upsc_digest.pdf</span>
+                </div>
+
+                <div class="success-actions">
+                    <button id="openPdfBtn" class="btn btn-primary btn-lg btn-glow">
+                        <i data-lucide="file-text" style="width:18px;height:18px;"></i>
+                        <span>Open File</span>
+                    </button>
+                    <button id="openFolderBtn" class="btn btn-secondary btn-lg">
+                        <i data-lucide="folder" style="width:18px;height:18px;"></i>
+                        <span>Show in Folder</span>
+                    </button>
+                    <button id="backToDashBtn" class="btn btn-tertiary">
+                        <i data-lucide="arrow-left" style="width:16px;height:16px;"></i>
+                        <span>Create Another Digest</span>
+                    </button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="script_app.js"></script>
+    <script>
+        // Initialize Lucide icons after DOM load
+        document.addEventListener('DOMContentLoaded', function() {
+            if (window.lucide) lucide.createIcons();
+        });
+    </script>
+</body>
+</html>

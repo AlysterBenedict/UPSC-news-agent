@@ -11,9 +11,9 @@ import json
 from datetime import datetime
 from typing import Any
 
-from app.models.schemas import VerifiedUnit, EvidenceItem, VerificationStatus, ErrorRecord
-from app.utils.logging import get_logger
-from app.utils.text import truncate_text
+from app.models.schemas_app import VerifiedUnit, EvidenceItem, VerificationStatus, ErrorRecord
+from app.utils.logging_app import get_logger
+from app.utils.text_app import truncate_text
 # No imports from source_policy needed in verification anymore
 
 log = get_logger(__name__)
@@ -72,8 +72,8 @@ def verify_units(state: dict) -> dict:
     Uses a ThreadPoolExecutor to verify units concurrently in parallel.
     """
     from concurrent.futures import ThreadPoolExecutor, as_completed
-    from app.services.llm_client import LLMClient
-    from config.settings import get_settings
+    from app.services.llm_client_app import LLMClient
+    from app.services.settings_app import get_settings
 
     settings = get_settings()
     analyzed_units = state.get("analyzed_units", [])

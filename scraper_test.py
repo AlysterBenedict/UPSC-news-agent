@@ -1298,8 +1298,18 @@ def run_scraper(tier_limit: int = 3, delay: float = 1.5,
 # ─────────────────────────────────────────────────────────────────────────────
 def save_outputs(articles: list[Article], stats: dict):
     today = TODAY_STR
-    json_path   = f"scraped_articles_{today}.json"
-    report_path = f"scrape_report_{today}.txt"
+    import os
+    from pathlib import Path
+    
+    env_dir = os.environ.get("SCRAPER_OUTPUT_DIR")
+    if env_dir:
+        output_dir = Path(env_dir).resolve()
+    else:
+        output_dir = Path(__file__).resolve().parent / "zartifacts"
+        
+    output_dir.mkdir(parents=True, exist_ok=True)
+    json_path   = str(output_dir / f"scraped_articles_{today}.json")
+    report_path = str(output_dir / f"scrape_report_{today}.txt")
 
     valid  = [a for a in articles if not a.error]
     errors = [a for a in articles if a.error]

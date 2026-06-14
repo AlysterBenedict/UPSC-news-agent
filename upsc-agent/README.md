@@ -23,7 +23,7 @@ Scraper Output (435 articles/day)
         │
         ▼
    A4 PDF (30-50+ pages)
-   → Email to sharonrishithas@gmail.com
+   → Email to [EMAIL_ADDRESS]
 ```
 
 ## Tech Stack

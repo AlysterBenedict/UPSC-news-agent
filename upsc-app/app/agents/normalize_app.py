@@ -11,11 +11,11 @@ from __future__ import annotations
 import re
 from typing import Optional
 
-from app.models.schemas import NormalizedArticle, ErrorRecord
-from app.utils.dates import parse_date
-from app.utils.text import remove_boilerplate, clean_whitespace
-from app.utils.logging import get_logger
-from app.utils.source_policy import classify_article_relevance
+from app.models.schemas_app import NormalizedArticle, ErrorRecord
+from app.utils.dates_app import parse_date
+from app.utils.text_app import remove_boilerplate, clean_whitespace
+from app.utils.logging_app import get_logger
+from app.utils.source_policy_app import classify_article_relevance
 
 log = get_logger(__name__)
 
@@ -68,7 +68,7 @@ def normalize_articles(state: dict) -> dict:
     - Preserves raw_text for traceability
     - Uses LLM-based classification to filter noise articles
     """
-    from config.settings import get_settings
+    from app.services.settings_app import get_settings
 
     settings = get_settings()
     articles_raw = state.get("articles_raw", [])

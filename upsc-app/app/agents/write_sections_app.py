@@ -17,8 +17,8 @@ import json
 import re
 from typing import Any
 
-from app.models.schemas import SectionName, ContentDepth
-from app.utils.logging import get_logger
+from app.models.schemas_app import SectionName, ContentDepth
+from app.utils.logging_app import get_logger
 
 log = get_logger(__name__)
 
@@ -176,7 +176,7 @@ ABSOLUTE RULES:
 
 BANNED PHRASES — Do NOT use any of these:
 "This is significant because", "It is worth noting", "In a landmark move",
-"Crucially", "Notably", "game-changer", "historic", "path-breaking"
+"Crucially", "Notes that", "Notably", "game-changer", "historic", "path-breaking"
 
 TONE: Analytical and neutral. Report the author's argument faithfully without endorsing or editorializing.
 
@@ -327,7 +327,7 @@ def clean_html_fragment(text: str) -> str:
         text = re.sub(phrase, "", text)
 
     # Resolve syllabus codes dynamically in syllabus-tag
-    from app.utils.syllabus import SYLLABUS_MAP
+    from app.utils.syllabus_app import SYLLABUS_MAP
     def resolve_syllabus(m):
         content = m.group(1)
         # Parse individual codes (split by comma, clean whitespace)
@@ -435,8 +435,8 @@ def write_sections(state: dict) -> dict:
     Uses a ThreadPoolExecutor to run LLM section-writing batches concurrently.
     """
     from concurrent.futures import ThreadPoolExecutor, as_completed
-    from app.services.llm_client import LLMClient
-    from config.settings import get_settings
+    from app.services.llm_client_app import LLMClient
+    from app.services.settings_app import get_settings
 
     settings = get_settings()
     section_buffers = state.get("section_buffers", {})

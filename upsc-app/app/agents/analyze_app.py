@@ -12,11 +12,11 @@ import time
 from pathlib import Path
 from typing import Any
 
-from app.models.schemas import AnalysisUnit, EvidenceItem, ErrorRecord
-from app.utils.logging import get_logger
-from app.utils.text import truncate_text
+from app.models.schemas_app import AnalysisUnit, EvidenceItem, ErrorRecord
+from app.utils.logging_app import get_logger
+from app.utils.text_app import truncate_text
 
-from app.utils.syllabus import SYLLABUS_MAP
+from app.utils.syllabus_app import SYLLABUS_MAP
 
 log = get_logger(__name__)
 
@@ -116,7 +116,6 @@ def _safe_float(value, default: float) -> float:
     except (TypeError, ValueError):
         return default
 
-
 def analyze_clusters(state: dict) -> dict:
     """
     Analysis Agent: Process clusters in parallel through LLM.
@@ -125,8 +124,8 @@ def analyze_clusters(state: dict) -> dict:
     ThreadPoolExecutor to run LLM analysis concurrently.
     """
     from concurrent.futures import ThreadPoolExecutor, as_completed
-    from app.services.llm_client import LLMClient
-    from config.settings import get_settings
+    from app.services.llm_client_app import LLMClient
+    from app.services.settings_app import get_settings
 
     settings = get_settings()
     clusters = state.get("article_clusters", [])

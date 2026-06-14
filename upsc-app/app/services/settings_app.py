@@ -1,7 +1,9 @@
 """
-UPSC Daily Digest — Central Configuration
-==========================================
-Loads all settings from environment variables / .env file.
+UPSC Daily Digest — Central Configuration (App-Local)
+======================================================
+Internalized settings for the desktop app. Does NOT depend on
+an external .env file — reads from environment variables set by
+the PyWebView wrapper (app_app.py) at runtime.
 """
 
 from __future__ import annotations
@@ -13,12 +15,19 @@ from typing import Optional
 from pydantic import Field
 from pydantic_settings import BaseSettings
 
+# Cached singleton instance
+_settings_instance: Optional["Settings"] = None
+
 
 class Settings(BaseSettings):
-    """Application settings loaded from .env file."""
+    """Application settings loaded from environment variables."""
 
     # --- NVIDIA NIM ---
-    nim_api_key: str = Field(..., alias="NIM_API_KEY")
+    # FIX: Default to empty string instead of Field(...) which crashes
+    # when no .env file is present (the EXE context).
+    # The app_app.py wrapper sets os.environ["NIM_API_KEY"] before
+    # any agent node instantiates Settings.
+    nim_api_key: str = Field(default="", alias="NIM_API_KEY")
     nim_base_url: str = Field(
         default="https://integrate.api.nvidia.com/v1", alias="NIM_BASE_URL"
     )
@@ -66,6 +75,9 @@ class Settings(BaseSettings):
     db_path: str = Field(default="./data/checkpoints.db", alias="DB_PATH")
 
     model_config = {
+        # FIX: Don't require .env file — gracefully handle missing files.
+        # In the EXE context, there is no .env file. The API key is set
+        # via os.environ by the PyWebView wrapper.
         "env_file": ".env",
         "env_file_encoding": "utf-8",
         "extra": "ignore",
@@ -103,5 +115,18 @@ class Settings(BaseSettings):
 
 
 def get_settings() -> Settings:
-    """Get cached settings instance."""
-    return Settings()
+    """Get cached settings singleton.
+    
+    Uses a singleton pattern so Settings() is only instantiated once
+    (avoiding repeated .env reads and validation).
+    """
+    global _settings_instance
+    if _settings_instance is None:
+        _settings_instance = Settings()
+    return _settings_instance
+
+
+def reset_settings() -> None:
+    """Reset the cached settings (useful when env vars change at runtime)."""
+    global _settings_instance
+    _settings_instance = None

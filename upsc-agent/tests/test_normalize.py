@@ -4,6 +4,17 @@ import pytest
 from app.agents.normalize import parse_source_name, normalize_articles
 
 
+@pytest.fixture(autouse=True)
+def mock_classification(monkeypatch):
+    """Automatically mock relevance classification to keep all articles by default."""
+    def mock_classify(articles, *args, **kwargs):
+        return {
+            art["article_id"]: {"relevant": True, "reason": "mocked relevant"}
+            for art in articles
+        }
+    monkeypatch.setattr("app.agents.normalize.classify_article_relevance", mock_classify)
+
+
 class TestSourceParsing:
     def test_indian_express_india(self):
         source, section = parse_source_name("Indian Express -- India")
