@@ -1,227 +1,238 @@
 # UPSC Daily Newspaper Digest — Multi-Agent AI System
 
-A **production-grade, multi-agent pipeline** that generates a 30–50+ page UPSC-focused PDF digest daily from scraped news articles and delivers it by email at 8 AM IST.
+A production-grade, multi-agent pipeline that aggregates news articles daily, deduplicates them, extracts detailed UPSC syllabus analyses, performs self-critiques to prevent hallucinations, and compiles a premium print-optimized A4 PDF delivered directly to email recipients by 8 AM IST. The project features a stateful command-line interface and a real-time, native desktop GUI wrapper.
 
-## Architecture
+---
+
+## System Architecture
 
 ```
-Scraper Output (435 articles/day)
-        │
-        ▼
-┌─────────────────────────────────────────────────────┐
-│                 LangGraph Pipeline                  │
-│                                                     │
-│  Ingest → Normalize → Dedup/Cluster → Analyze(LLM) │
-│  → Verify(LLM) → Map UPSC → Write Sections(LLM)   │
-│  → Assemble HTML → Render PDF → Email → Audit      │
-│                                                     │
-│  ✓ SQLite checkpointing                             │
-│  ✓ Incremental processing (1 cluster at a time)     │
-│  ✓ Anti-hallucination verification                  │
-│  ✓ Source traceability                              │
-└─────────────────────────────────────────────────────┘
-        │
-        ▼
-   A4 PDF (30-50+ pages)
-   → Email to [EMAIL_ADDRESS]
+Scraper Output (400+ articles/day)
+         │
+         ▼
+┌───────────────────────────────────────────────────────────────────┐
+│                    LangGraph Stateful Pipeline                    │
+│                                                                   │
+│  [Ingest] ──► [Normalize] ──► [Cluster & Dedup] ──► [Analyze]     │
+│                                                        │          │
+│  [HTML Compile] ◄── [Section Write] ◄── [Verify] ◄─────┘          │
+│        │                                                          │
+│        ▼                                                          │
+│  [Render PDF] ──► [Email Delivery] ──► [Audit logs]               │
+│                                                                   │
+│  ✓ Persistent SQLite Checkpointing (Resume from any step)         │
+│  ✓ Dual-Gate Anti-Hallucination Self-Critique                     │
+│  ✓ Cosine Similarity Embedding Clustering (sentence-transformers)  │
+│  ✓ Source Provenance Traceability                                 │
+└───────────────────────────────────────────────────────────────────┘
+         │
+         ▼
+    Premium A4 PDF (30-50+ pages) ──► Email to Subscribers
 ```
+
+---
+
+## Detailed Features & Technical Implementation
+
+### 1. Robust Multi-Source News Scraper (`scraper_test.py`)
+Fetches and aggregates news content from major national dailies and government websites.
+* **Mode Dispatcher:** Dispatches scraping jobs based on the target website's format:
+  * `rss`: Fetches XML feeds and downloads the article body.
+  * `listing`: Scrapes HTML index pages using BeautifulSoup CSS selectors to find articles.
+  * `api`: Queries structured JSON endpoints (e.g. MEA's press releases, Down To Earth's story APIs).
+  * `rss+web`: Combines RSS feeds with listing scraping to ensure complete coverage.
+* **Date Filter:** Restricts processing to today's articles using strict timezone-aware Indian Standard Time (IST) date matching.
+* **Fallback & Recovery:** Extracts text using JSON-LD metadata formats as a backup when CSS selectors fail. Uses exponential backoff retries and browser User-Agent headers to handle rate-limiting.
+* **Output Destination:** Writes outputs (`scraped_articles_{date}.json` and `scrape_report_{date}.txt`) to the `zartifacts/` folder.
+
+### 2. Stateful Graph Orchestration (LangGraph & SQLite)
+Orchestrates the pipeline phases using a stateful directed acyclic graph.
+* **LangGraph `StateGraph`:** Defines pipeline stages as graph nodes. Transitions are managed with a TypedDict shared state.
+* **SQLite Checkpointing:** Saves a snapshot of the graph state to `checkpoints.db` after each node execution. If a step fails, the pipeline can resume execution from the last successful node.
+
+### 3. Ingestion & Schema Validation (Pydantic)
+Validates and sanitizes incoming scraper data.
+* **Pydantic Validation:** Models raw articles using strict schemas to prevent schema mismatch errors from corrupt scraper formats.
+* **Deterministic Tracking:** Generates a unique SHA-256 hash based on the article URL and source to deduplicate incoming items.
+
+### 4. Dense Embeddings & Clustering (Sentence-Transformers & scikit-learn)
+Groups related articles covering the same event into unique topic clusters.
+* **Local Embeddings:** Encodes article titles and first 500 characters into dense vectors using a local `all-MiniLM-L6-v2` transformer model (saving API costs).
+* **Agglomerative Clustering:** Performs clustering with an average-linkage metric using a cosine distance threshold of `0.25` (cosine similarity > `0.75`).
+* **Primary Source Selection:** Identifies the longest article as the primary source, appending unique paragraphs from supporting articles to form a single combined cluster text.
+
+### 5. Structured UPSC Analysis (NVIDIA NIM Llama 3.3)
+Extracts academic context from news clusters using LLMs.
+* **Syllabus Mapping:** Classifies clusters against the UPSC Civil Services Syllabus (GS Paper 1, 2, 3, or 4) and tags relevant subtopics.
+* **UPSC Extraction:** Formulates structured JSON outputs (`AnalysisUnit`) capturing:
+  * **Core Facts:** Essential data points and events.
+  * **Context:** Background information.
+  * **Syllabus Relevance:** Explanation of why it's important for the exam.
+  * **Key Terms:** Essential terminology.
+  * **Logical Arguments:** Major viewpoints and arguments.
+
+### 6. Dual-Gate Verification (Anti-Hallucination Guardrails)
+Ensures factual accuracy by validating LLM statements against source texts.
+* **Line-by-Line Critique:** Compares each statement in the analysis block against the raw article text using the LLM.
+* **Verification Scoring:** Labels each claim with a verification status (`pass`, `partial`, `fail`).
+* **Source Mapping:** Requires the LLM to identify the exact source text span that supports the claim. If a claim fails verification, it is deleted from the final report.
+
+### 7. Syllabus Mapping & Section Writing (Jinja2 & NIM Llama 3.1)
+Synthesizes verified inputs into cohesive study materials.
+* **Routing:** Maps verified units to subject categories (National, International Relations, Economy, Opinion, etc.).
+* **Section Prose Generation:** Uses Llama 3.1 to rewrite batches of 8-12 articles into cohesive, analytical sections. The output is structured to mirror UPSC answers: objective, crisp, and focused on policy implications.
+
+### 8. Premium A4 PDF Rendering (WeasyPrint)
+Generates print-ready PDFs from the compiled HTML.
+* **Print CSS Rules:** Uses CSS paged media rules (`@page`) to manage margins, page numbering, running headers, and footers.
+* **Document Structure:** Integrates a table of contents and inserts page break controls (`page-break-inside: avoid`) to prevent orphan headers or split tables.
+* **Styling:** Uses clear typography (Georgia/Inter), subtle borders, and balanced spacing.
+
+### 9. Real-Time Desktop App Interface (PyWebView)
+Runs the pipeline within a desktop application window.
+* **API Key Manager:** Saves and loads settings from `config.json`, setting `os.environ["NIM_API_KEY"]` dynamically before launching the graph.
+* **Log Redirection:** Captures `stdout` and `stderr` using a queue-based `LogEmitter`. Throttles updates at a 100ms interval to prevent UI lag.
+* **Native Integration:** Uses PyWebView window hooks for native file saving dialogs and default application handlers (`os.startfile`) to open generated PDFs.
+
+### 10. PyInstaller Packaging & Self-Installation
+Packages the desktop app for simple deployment.
+* **Single EXE Compilation:** Bundles Python, libraries, and UI templates into a single `UPSC_Digest_Agent.exe` file.
+* **Subprocess Interception:** Detects CLI scraper arguments on launch and executes the scraper in-process rather than attempting to spawn a separate python environment.
+* **Start Menu & Program Files Installer:** Automatically copies the binary to local program files and registers a Start Menu shortcut on Windows.
+
+---
 
 ## Tech Stack
 
-| Component        | Technology                                      |
-|------------------|-------------------------------------------------|
-| Orchestration    | LangGraph (stateful graph with checkpointing)   |
-| LLM              | NVIDIA NIM Nemotron via OpenAI-compatible API    |
-| Embeddings       | sentence-transformers (all-MiniLM-L6-v2, local)  |
-| Clustering       | scikit-learn AgglomerativeClustering              |
-| Schemas          | Pydantic v2                                       |
-| HTML Templates   | Jinja2                                            |
-| PDF Rendering    | WeasyPrint                                        |
-| Scheduling       | APScheduler (8 AM IST daily)                      |
-| Email            | Gmail SMTP                                        |
-| Logging          | structlog (JSON structured)                       |
+| Component        | Technology                                       |
+|------------------|--------------------------------------------------|
+| **Orchestration** | LangGraph (Stateful graph with SQLite checkpointer) |
+| **LLM Inference** | NVIDIA NIM API (Llama 3.3 70B & Llama 3.1 8B)     |
+| **Local Embeddings** | Sentence-Transformers (`all-MiniLM-L6-v2`)     |
+| **Clustering**   | Scikit-Learn `AgglomerativeClustering`          |
+| **Validation**   | Pydantic v2                                      |
+| **PDF Converter** | WeasyPrint                                       |
+| **GUI Container** | PyWebView                                        |
+| **CLI Parser**   | argparse                                         |
+| **Logging**      | structlog (Structured JSON format)               |
+| **Scheduler**    | APScheduler (APS)                                |
 
-## Setup
+---
 
-### 1. Prerequisites
+## Project Structure
+
+```
+UPSC news agent/
+├── scraper_test.py                  # News scraper script
+├── zartifacts/                      # Scraper JSON and TXT output directory
+├── upsc-app/                        # Desktop GUI App
+│   ├── app_app.py                   # Desktop app GUI launcher and API bridge
+│   ├── build_app.py                 # PyInstaller execution configuration
+│   ├── UPSC_Digest_Agent.spec       # PyInstaller build specification
+│   ├── icon.ico                     # Native application icon
+│   ├── ui/                          # GUI HTML, CSS, JS frontend assets
+│   │   ├── index_app.html
+│   │   ├── style_app.css
+│   │   └── script_app.js
+│   └── app/                         # App-specific services and modules
+│       ├── agents/                  # GUI-compatible agents (suffixed _app.py)
+│       ├── graph/                   # GUI-compatible graph implementation
+│       ├── services/                # Settings, Storage, and Mailer services
+│       └── utils/                   # Logging, Date, and File utilities
+│
+└── upsc-agent/                      # Core CLI Pipeline
+    ├── main.py                      # Core CLI main runner
+    ├── requirements.txt             # Python dependencies
+    ├── .env                         # Local secrets and config (git-ignored)
+    ├── .env.example                 # Environment config template
+    ├── config/
+    │   └── settings.py              # Pydantic Settings class
+    ├── app/                         # Primary pipeline code
+    │   ├── agents/                  # Pipeline stage processors
+    │   ├── graph/                   # Stateful graph definition
+    │   ├── models/                  # Pydantic schemas (schemas.py)
+    │   ├── services/                # LLM client, Embeddings, Storage, Mailer
+    │   ├── templates/               # Jinja2 HTML design templates
+    │   └── utils/                   # Logging, cleaning, files, syllabus
+    ├── data/                        # Persistent run data and logs
+    │   ├── checkpoints.db           # SQLite graph checkpoint storage
+    │   ├── logs/                    # Runtime log storage
+    │   └── runs/                    # Individual run data directories
+    └── output/                      # Compiled output PDFs directory
+```
+
+---
+
+## Setup & Run Guide
+
+### 1. Configure the Environment
+Clone the repository and create your local environment:
 ```bash
-# Ensure conda env exists
+conda create --name upsc-digest python=3.11
 conda activate upsc-digest
 ```
 
-### 2. Install Dependencies
+Navigate to `upsc-agent` and install dependencies:
 ```bash
 cd upsc-agent
 pip install -r requirements.txt
 ```
 
-### 3. Configure Environment
+### 2. Configure Credentials
+Copy `.env.example` to `.env`:
 ```bash
-# Copy and edit .env
 cp .env.example .env
-# Edit .env with your credentials:
-# - NIM_API_KEY (your NVIDIA NIM key)
-# - SMTP_PASS (Gmail App Password — generate at https://myaccount.google.com/apppasswords)
 ```
+Fill in the configuration details:
+* `NIM_API_KEY`: Obtain an API key from [NVIDIA NIM](https://build.nvidia.com).
+* `SMTP_PASS`: Generate a Gmail App Password at [Google Account App Passwords](https://myaccount.google.com/apppasswords) if delivering digests via email.
 
-### 4. Gmail App Password
-To send emails via Gmail, you need an **App Password**:
-1. Go to https://myaccount.google.com/apppasswords
-2. Generate a new app password for "Mail"
-3. Put that 16-character password in `.env` as `SMTP_PASS`
+---
 
 ## Usage
 
-### Run Full Pipeline (Today)
-```bash
-conda create --name upsc-digest python=3.11
-conda activate upsc-digest
-cd upsc-agent
-python main.py run
-```
+### Command Line Interface
 
-### Run for Specific Date
-```bash
-python main.py run --date 2026-06-09
-```
+* **Run the full pipeline for today:**
+  ```bash
+  python main.py run
+  ```
 
-### Start Daily Scheduler (8 AM IST)
-```bash
-python main.py schedule
-```
+* **Run the pipeline for a specific date:**
+  ```bash
+  python main.py run --date 2026-06-14
+  ```
 
-### Render PDF Only (from existing run)
-```bash
-python main.py render-only --run-id digest_2026-06-09_abc12345
-```
+* **Start the 8 AM IST Daily Scheduler:**
+  ```bash
+  python main.py schedule
+  ```
 
-### Send Existing PDF
-```bash
-python main.py deliver-only --pdf output/UPSC_Digest_2026-06-09.pdf --date 2026-06-09
-```
+* **Skip the scraping phase and use existing JSON files:**
+  ```bash
+  python main.py run --skip-scrape
+  ```
 
-## Project Structure
+* **Render a PDF only from a past run:**
+  ```bash
+  python main.py render-only --run-id digest_2026-06-14_abcdefgh
+  ```
 
-```
-upsc-agent/
-├── main.py                          # CLI entry point
-├── requirements.txt                 # Python dependencies
-├── .env                             # Environment config (git-ignored)
-├── .env.example                     # Config template
-│
-├── config/
-│   └── settings.py                  # Pydantic settings from .env
-│
-├── app/
-│   ├── agents/                      # 11 pipeline agents
-│   │   ├── ingestion.py             # Load & validate scraper output
-│   │   ├── normalize.py             # Clean text, parse dates
-│   │   ├── dedup.py                 # Embed & cluster articles
-│   │   ├── analyze.py               # LLM: structured UPSC analysis
-│   │   ├── verify.py                # LLM: fact-check against source
-│   │   ├── map_upsc.py              # Route to GS sections
-│   │   ├── write_sections.py        # LLM: write section prose
-│   │   ├── assemble.py              # Compile HTML document
-│   │   ├── render_pdf.py            # HTML → A4 PDF (WeasyPrint)
-│   │   ├── deliver.py               # Email PDF via SMTP
-│   │   └── audit.py                 # Run report generation
-│   │
-│   ├── graph/
-│   │   ├── state.py                 # LangGraph TypedDict state
-│   │   └── workflow.py              # StateGraph pipeline definition
-│   │
-│   ├── models/
-│   │   └── schemas.py               # All Pydantic data models
-│   │
-│   ├── services/
-│   │   ├── llm_client.py            # OpenAI-compatible LLM client
-│   │   ├── embedding_client.py      # sentence-transformers embeddings
-│   │   ├── storage.py               # File-based artifact storage
-│   │   ├── mailer.py                # Gmail SMTP sender
-│   │   └── scheduler.py             # APScheduler daily cron
-│   │
-│   ├── templates/
-│   │   └── base.html                # Jinja2 A4 PDF template
-│   │
-│   └── utils/
-│       ├── logging.py               # structlog configuration
-│       ├── text.py                   # Boilerplate removal, cleaning
-│       ├── dates.py                  # Multi-format date parsing
-│       └── files.py                 # JSON/file I/O helpers
-│
-├── tests/
-│   ├── conftest.py                  # Sample article fixtures
-│   ├── test_schemas.py              # Schema validation tests
-│   ├── test_normalize.py            # Normalization tests
-│   └── test_dedup.py                # Clustering tests
-│
-├── data/                            # Run artifacts (auto-created)
-│   ├── runs/                        # Per-run directories
-│   │   └── digest_2026-06-09_xxxx/
-│   │       ├── raw_articles.json
-│   │       ├── normalized_articles.json
-│   │       ├── clusters.json
-│   │       ├── analysis_units/
-│   │       ├── verified_units/
-│   │       ├── sections/
-│   │       ├── compiled_digest.html
-│   │       └── run_report.json
-│   ├── logs/
-│   └── checkpoints.db
-│
-└── output/                          # Final PDFs
-    └── UPSC_Digest_2026-06-09.pdf
-```
+* **Send an existing PDF file to email subscribers:**
+  ```bash
+  python main.py deliver-only --pdf output/UPSC_Digest_2026-06-14.pdf --date 2026-06-14
+  ```
 
-## Pipeline Stages
+### Desktop Application
 
-| # | Agent           | Input                  | Output                 | LLM? |
-|---|-----------------|------------------------|------------------------|------|
-| 1 | Ingestion       | Scraper JSON           | Validated raw articles | No   |
-| 2 | Normalization   | Raw articles           | Cleaned articles       | No   |
-| 3 | Deduplication   | Normalized articles    | Article clusters       | No   |
-| 4 | Analysis        | 1 cluster at a time    | AnalysisUnit JSON      | Yes  |
-| 5 | Verification    | 1 unit + source text   | VerifiedUnit JSON      | Yes  |
-| 6 | UPSC Mapping    | Verified units         | Section buffers        | No   |
-| 7 | Section Writing | Batches of 8-12 units  | HTML fragments         | Yes  |
-| 8 | Assembly        | All section fragments  | compiled_digest.html   | No   |
-| 9 | PDF Render      | Compiled HTML          | A4 PDF                 | No   |
-| 10| Delivery        | PDF file               | Email sent             | No   |
-| 11| Audit           | Full state             | run_report.json        | No   |
+* **Run the GUI app in development mode:**
+  ```bash
+  cd upsc-app
+  python app_app.py
+  ```
 
-## Anti-Hallucination Design
-
-1. **Separate prompts** for analysis, verification, and writing
-2. **Evidence mapping**: Every claim links to a source text span
-3. **Verification gate**: Only pass/partial units proceed
-4. **No-new-facts rule**: Writer cannot introduce unsupported content
-5. **Source traceability**: Article IDs preserved through entire pipeline
-
-## Debugging
-
-### Inspect Run Artifacts
-```bash
-# List runs
-ls data/runs/
-
-# View a specific run
-ls data/runs/digest_2026-06-09_xxxx/
-
-# Check run report
-cat data/runs/digest_2026-06-09_xxxx/run_report.json
-
-# View analysis for a cluster
-cat data/runs/digest_2026-06-09_xxxx/analysis_units/cluster_0001.json
-```
-
-### View Logs
-```bash
-cat data/logs/digest.log
-```
-
-### Run Tests
-```bash
-conda activate upsc-digest
-cd upsc-agent
-pytest tests/ -v
-```
+* **Compile the standalone executable:**
+  ```bash
+  python build_app.py
+  ```
+  This creates a standalone executable inside `upsc-app/dist/` named `UPSC_Digest_Agent.exe`.
