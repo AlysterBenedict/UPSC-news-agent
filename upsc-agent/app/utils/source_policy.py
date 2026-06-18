@@ -28,6 +28,11 @@ log = get_logger(__name__)
 
 CLASSIFICATION_SYSTEM_PROMPT = """You are a UPSC Civil Services news relevance classifier. Your ONLY job is to decide whether a news article is relevant to UPSC preparation or should be DROPPED as noise.
 
+CRITICAL RULE FOR POLITICS vs. POLICY:
+UPSC preparation focuses strictly on administration, policy, governance, law, and international affairs. It has ZERO tolerance for political drama, electoral math, party bickering, and election campaigns.
+- If an article focuses on political competition (who is allied with whom, who gets which seat, who is fighting, what a politician said to attack a rival), you MUST classify it as RELEVANT = FALSE.
+- Casual mentions of a policy, minister, or government department within a political fight does NOT make the article relevant. There must be deep, substantive discussion of policy, legislation, governance, or constitutional principles to qualify.
+
 Respond with ONLY a valid JSON object: {"relevant": true, "reason": "..."} or {"relevant": false, "reason": "..."}
 The "reason" field must be 10 words or fewer.
 
@@ -57,7 +62,10 @@ The "reason" field must be 10 words or fewer.
 - Bollywood/Hollywood/Tollywood: movie reviews, box office collections, trailer launches, OTT releases, web series, album launches, concerts, reality shows (Bigg Boss etc.), award shows (Filmfare, IIFA), standup comedy
 - Lifestyle content: recipes, cooking tips, fashion trends, beauty tips, skincare, fitness tips, workout routines, diet plans, weight loss, travel guides, hotel reviews, home decor, parenting tips, pet care, gardening tips, relationship advice, dating tips, self-help
 - Sports match results & league updates: cricket scores, IPL match results/auctions/playoffs, football league scores (Premier League, La Liga etc.), tennis match results, F1 race results, kabaddi/hockey scores, fantasy cricket/football, player transfers, playing XI, Dream11
-- Inter-party political mudslinging: Party A blames/attacks/slams Party B, opposition criticizes ruling party (or vice versa) with NO policy substance, political blame-games, "war of words" between politicians, personal attacks between politicians — UNLESS the exchange is about a specific policy, bill, or governance issue
+- Political drama, fights & election campaigning:
+  - All electoral calculations, seat sharing, candidate ticket distributions, candidate lists, constituency analyses, and election campaign coverage (rallies, speeches, slogans).
+  - All internal party affairs, party leadership struggles, splits, defections (horse-trading), alliance formations, coalition negotiations, cabinet portfolio disputes, and MLA/MP/ministerial seat bargaining.
+  - All generic political bickering and "war of words" ("Party A slams/attacks/mocks Party B" or "Opposition criticizes ruling party") that focus on political points rather than substantive policy analysis.
 - Horoscopes, astrology, numerology, vastu tips, tarot, rashifal, kundli
 - Product reviews, gadget reviews, smartphone/laptop/earbuds reviews, unboxing
 - Deals, sales, discount offers, sponsored content, advertorials, brand stories
@@ -72,7 +80,12 @@ The "reason" field must be 10 words or fewer.
 - "Virat Kohli scores century in IPL match" → EXCLUDE (match result)
 - "Sachin receives Bharat Ratna" → INCLUDE (national award)
 - "BJP slams Congress over farm bill" → INCLUDE (policy substance: farm bill)
-- "BJP calls Congress corrupt, Congress hits back" → EXCLUDE (mudslinging, no policy)
+- "BJP calls Congress corrupt, Congress hits back" → EXCLUDE (political mudslinging, no policy)
+- "Congress and SP lock horns over seat sharing in state elections" → EXCLUDE (political drama, seat allocation)
+- "MLA X threatens to resign over cabinet berth dispute" → EXCLUDE (political fight, cabinet dispute)
+- "Internal party rift leads to delay in cabinet expansion in state Y" → EXCLUDE (political drama, party dynamics)
+- "Union Minister reviews implementation progress of semiconductor policy" → INCLUDE (governance/policy monitoring)
+- "Minister X targets opponent Y during election campaign rally" → EXCLUDE (election campaign speech)
 - "Actress wedding photos go viral" → EXCLUDE (celebrity gossip)
 - "Film director wins National Film Award" → INCLUDE (national award)
 - "New Netflix series review" → EXCLUDE (entertainment)

@@ -59,11 +59,11 @@ def deduplicate_articles(state: dict) -> dict:
         )
         return {"article_clusters": [cluster.model_dump()], "current_phase": "clustered"}
 
-    # Build embedding texts: title + first 500 chars of clean text
+    # Build embedding texts: title + first 800 chars of clean text
     embed_texts = []
     for art in articles:
         title = art.get("title", "")
-        text = art.get("clean_text", "")[:500]
+        text = art.get("clean_text", "")[:800]
         embed_texts.append(f"{title}. {text}")
 
     # Compute embeddings
@@ -89,14 +89,14 @@ def deduplicate_articles(state: dict) -> dict:
         return {"article_clusters": clusters, "current_phase": "clustered"}
 
     # Agglomerative clustering with cosine distance
-    # distance_threshold=0.25 means articles with cosine similarity > 0.75 are grouped
+    # distance_threshold=0.35 means articles with cosine similarity > 0.65 are grouped
     distance_matrix = 1 - client.cosine_similarity_matrix(embeddings)
     # Clip to avoid numerical issues
     distance_matrix = np.clip(distance_matrix, 0, 2)
 
     clustering = AgglomerativeClustering(
         n_clusters=None,
-        distance_threshold=0.25,
+        distance_threshold=0.35,
         metric="precomputed",
         linkage="average",
     )

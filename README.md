@@ -57,8 +57,8 @@ Validates and sanitizes incoming scraper data.
 
 ### 4. Dense Embeddings & Clustering (Sentence-Transformers & scikit-learn)
 Groups related articles covering the same event into unique topic clusters.
-* **Local Embeddings:** Encodes article titles and first 500 characters into dense vectors using a local `all-MiniLM-L6-v2` transformer model (saving API costs).
-* **Agglomerative Clustering:** Performs clustering with an average-linkage metric using a cosine distance threshold of `0.25` (cosine similarity > `0.75`).
+* **Local Embeddings:** Encodes article titles and first 800 characters into dense vectors using a local `all-MiniLM-L6-v2` transformer model (saving API costs).
+* **Agglomerative Clustering:** Performs clustering with an average-linkage metric using a cosine distance threshold of `0.35` (cosine similarity > `0.65`).
 * **Primary Source Selection:** Identifies the longest article as the primary source, appending unique paragraphs from supporting articles to form a single combined cluster text.
 
 ### 5. Structured UPSC Analysis (NVIDIA NIM Llama 3.3)
