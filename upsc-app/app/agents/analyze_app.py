@@ -39,6 +39,16 @@ CRITICAL RULES:
 10. Generate a `revision_one_line_summary`: A single concise sentence (max 20 words) that captures EXACTLY what happened — like a newspaper headline but slightly more informative. This is for a quick revision cheat sheet.
 11. Generate `revision_key_data_points`: Extract ONLY the 2-3 most important numbers, statistics, or named facts from the article. Each must be short (under 15 words). If no quantitative data exists, use the most critical named entities or dates. This is for quick revision, not exhaustive listing.
 12. Assign `primary_category` — the SINGLE best-fit section for this article. Choose from: "gs2_polity", "gs2_ir", "gs3_economy", "gs3_environment", "gs3_scitech", "gs1_society", "editorial", "pib". If an article covers multiple GS papers, assign all to `gs_papers` but put the PRIMARY topic first in that array.
+13. SCAN Strategy Focus: In your extraction, ensure you capture details necessary for:
+    - Situation (S): Underlying structural problems and systemic root causes.
+    - Consequences (C): 360-degree impact on multiple stakeholders, especially vulnerable groups (salaried middle class, senior citizens, small businesses).
+    - Alternatives (A): Alternative options and public administration trade-offs.
+    - Next Step (N) / Way Forward: Timeline-oriented action plan (Short, Mid, Long term) from an administrative/DM perspective.
+14. The 3 Lenses: Structure your analysis using:
+    - Governance Lens (for policies): who was previously excluded, who benefits, implementation challenges, success metrics.
+    - Administrative Lens (for crises): failures in administration, regulatory frameworks to improve, agency accountability. Avoid emotional narratives.
+    - Reasoning Lens (for opinions/editorials): dissection of the logic, framing, arguments, and counter-arguments.
+15. STRICT EXCLUSIONS: Exclude regional tragedies and local crimes that offer no administrative takeaway. Do not extract hyper-specific sensationalism (like exact casualty counts, nationalities, or locations of localized municipal fires). Strictly exclude all political drama, electoral math, coalition disputes, defection/horse-trading, party bickering, and election campaigns with no administrative or policy significance.
 
 OFFICIAL UPSC SYLLABUS CODES (pick from these):
 {_syllabus_codes_str}

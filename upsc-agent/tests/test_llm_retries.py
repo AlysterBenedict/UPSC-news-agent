@@ -89,8 +89,8 @@ def test_llm_client_generate_json_retries_on_malformed_json(monkeypatch):
     assert sleep_calls == [2.0, 4.0]
 
 
-def test_verify_units_fails_on_exception(monkeypatch):
-    """Test that verify_units propagates exception and fails fast instead of falling back."""
+def test_verify_units_logs_exception(monkeypatch):
+    """Test that verify_units captures the exception in the errors list instead of crashing."""
     # 1. Prepare sample analyzed units and clusters
     analyzed_units = [
         {
@@ -112,17 +112,17 @@ def test_verify_units_fails_on_exception(monkeypatch):
 
     monkeypatch.setattr(LLMClient, "verify_analysis", mock_verify_analysis)
 
-    # 3. Run verify_units and assert it propagates the exception
+    # 3. Run verify_units and assert it logs the exception in the errors list
     state = {
         "analyzed_units": analyzed_units,
         "article_clusters": clusters,
         "run_id": "test_run",
     }
 
-    with pytest.raises(RuntimeError) as exc_info:
-        verify_units(state)
-
-    assert "Fatal Database Connection Error" in str(exc_info.value)
+    result = verify_units(state)
+    assert len(result["errors"]) == 1
+    assert result["errors"][0]["error_type"] == "RuntimeError"
+    assert "Fatal Database Connection Error" in result["errors"][0]["message"]
 
 
 def test_saving_results_json(tmp_path, monkeypatch):

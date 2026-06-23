@@ -121,6 +121,17 @@ YOUR OUTPUT FORMAT — for each article, produce EXACTLY this HTML structure:
     <strong>Way Forward:</strong> [Constructive path forward/recommendations from the source text]
   </div>
 
+  <!-- Include this box ONLY for units with content_depth "full" or "medium" -->
+  <div class="scan-analysis-box">
+    <strong>SCAN Analysis:</strong>
+    <ul>
+      <li><span class="scan-label scan-s">S — Situation:</span> [Dig below the surface level. Identify the underlying structural problem and systemic root causes]</li>
+      <li><span class="scan-label scan-c">C — Consequences:</span> [Map out a 360-degree view of how the event or policy impacts multiple stakeholders—especially vulnerable groups like salaried middle class, senior citizens, or small businesses]</li>
+      <li><span class="scan-label scan-a">A — Alternatives:</span> [Weigh choices and analyze what else could have been done, acknowledging the trade-offs and selecting the better public administration option]</li>
+      <li><span class="scan-label scan-n">N — Next Step:</span> [Structured timeline-oriented action plan. Explicit steps to execute in the short, mid, and long term as if you were the Officer-in-Charge or District Magistrate (DM)]</li>
+    </ul>
+  </div>
+
   <p class="gs-tag"><strong>GS</strong>: Paper & Topic | <strong>Prelims</strong>: key terms, schemes, institutions | <strong>Mains</strong>: one-line answer angle</p>
 </div>
 
@@ -135,11 +146,17 @@ ABSOLUTE RULES:
 8. The <p class="gs-tag"> line is MANDATORY for every article.
 9. Multi-Source Perspective Synthesis (Editorial Contrast): If a unit lists multiple sources in its "sources" field (e.g. both "The Hindu" and "Indian Express"), synthesize their points and explicitly contrast any differing editorial perspectives or focuses inline inside the summary paragraph (e.g., "While [The Hindu] emphasizes the federalism concerns of the bill, [Indian Express] focuses on its administrative efficiency gains").
 10. Static Sync Tag: Retrieve the "static_links" list from the unit data and print it inside the `<span class="static-tag">` element. If no static links are present, output "N/A".
+11. SCAN Method implementation: The `scan-analysis-box` MUST be populated ONLY for articles that have `content_depth` equal to "full" or "medium". For articles with `content_depth` equal to "concise" or "prelims_only", do NOT include the `scan-analysis-box` block at all (omit it completely from the HTML output). Dig deep into the structural, stakeholder, trade-off, and implementation action plan aspects for full/medium articles to build the required administrative mindset.
+12. Three Lenses integration: Apply the appropriate lens based on the nature of the article:
+    - Policy Articles (Governance Lens): Focus on how a government policy solves a specific issue. Identify who was previously excluded, which vulnerable group benefits now, and foresee potential implementation challenges. Think about the metrics/data required a year later to evaluate if the policy succeeded.
+    - Crisis Articles (Administrative Lens): For disasters, industrial accidents, or infrastructure failures, avoid purely emotional narratives. Analyze what failed within the local administration, which existing regulatory framework can be improved, and which agency holds structural accountability.
+    - Opinions & Op-Eds (Reasoning Lens): Dissect the logic and framework of reasoning. Learn how experts frame arguments, address counter-arguments, and defend their perspective.
+13. Strict Exclusions: Strictly exclude hyper-specific sensationalism or local crime. Do not include details of regional tragedies with no administrative takeaway (e.g., exact casualty counts, nationalities, or locations of localized municipal fires). Also strictly exclude all political drama, party rivalry, seat sharing, defection, election campaigning, or political attacks that have no substantive administrative or policy significance.
 
 BANNED PHRASES — Do NOT use any of these:
 "This is significant because", "It is worth noting", "In a landmark move",
 "In a significant development", "The move is expected to", "This marks a",
-"Crucially", "Notes that", "Notably", "Importantly", "Interestingly",
+"Crucially", "Notes that", "Notes that", "Notably", "Importantly", "Interestingly",
 "game-changer", "historic", "path-breaking", "watershed moment",
 "bold step", "major boost", "much-needed", "long-awaited",
 "sends a strong signal", "remains to be seen", "only time will tell"
@@ -161,6 +178,18 @@ YOUR OUTPUT FORMAT — for each editorial, produce EXACTLY this HTML structure:
   <p><strong>Argument:</strong> Central thesis in 1-2 sentences, as stated by the author.</p>
   <p><strong>Key Points:</strong> 2-3 most important arguments or evidence points from the editorial. Use bullet format with <em>•</em> separators.</p>
   <p><strong>Counter:</strong> Alternative perspective or limitation acknowledged in the piece, in 1 sentence.</p>
+
+  <!-- SCAN Analysis Box -->
+  <div class="scan-analysis-box">
+    <strong>SCAN Analysis:</strong>
+    <ul>
+      <li><span class="scan-label scan-s">S — Situation:</span> [Dig below the surface level. Identify the underlying structural problem and systemic root causes]</li>
+      <li><span class="scan-label scan-c">C — Consequences:</span> [Map out a 360-degree view of how the event or policy impacts multiple stakeholders—especially vulnerable groups like salaried middle class, senior citizens, or small businesses]</li>
+      <li><span class="scan-label scan-a">A — Alternatives:</span> [Weigh choices and analyze what else could have been done, acknowledging the trade-offs and selecting the better public administration option]</li>
+      <li><span class="scan-label scan-n">N — Next Step:</span> [Structured timeline-oriented action plan. Explicit steps to execute in the short, mid, and long term as if you were the Officer-in-Charge or District Magistrate (DM)]</li>
+    </ul>
+  </div>
+
   <p class="gs-tag"><strong>GS</strong>: Paper & Topic | <strong>Mains</strong>: answer framing angle</p>
 </div>
 
@@ -169,10 +198,13 @@ ABSOLUTE RULES:
 2. Start with `<div class="brief-card">` immediately. Output NOTHING before the first tag.
 3. End with the last `</div>` tag. Output NOTHING after.
 4. Use ONLY HTML tags. No markdown syntax.
-5. Maximum 120 words per editorial.
+5. Maximum 220 words per editorial card, keeping the SCAN analysis concise.
 6. STATE ONLY WHAT THE SOURCE SAYS. Do NOT add your own arguments or analysis.
 7. The <p class="gs-tag"> line is MANDATORY.
 8. For Counter: if the editorial doesn't present a counterview, write "Not addressed in the piece."
+9. SCAN Method: The `scan-analysis-box` MUST be populated for every editorial, following the SCAN structure (Situation, Consequences, Alternatives, Next Step) to build the required administrative mindset.
+10. Reasoning Lens: Dissect the logic and framework of reasoning. Show how experts frame arguments, address counter-arguments, and defend their perspective.
+11. Strict Exclusions: Exclude regional/local crime and sensationalism. Focus on systemic, structural, and administrative takeaways.
 
 BANNED PHRASES — Do NOT use any of these:
 "This is significant because", "It is worth noting", "In a landmark move",
