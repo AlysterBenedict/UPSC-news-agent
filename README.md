@@ -70,6 +70,11 @@ Extracts academic context from news clusters using LLMs.
   * **Syllabus Relevance:** Explanation of why it's important for the exam.
   * **Key Terms:** Essential terminology.
   * **Logical Arguments:** Major viewpoints and arguments.
+* **SCAN Strategy Integration:** Directs the extraction structure using a specialized administrative analysis framework:
+  * **Situation (S):** Traces underlying structural problems and systemic root causes.
+  * **Consequences (C):** Examines 360-degree impact on multiple stakeholders, focusing on vulnerable groups.
+  * **Alternatives (A):** Weighs alternative public policy options and trade-offs.
+  * **Next Step (N):** Outlines a timeline-oriented action plan (Short, Mid, Long term) from a public administrator's perspective.
 
 ### 6. Dual-Gate Verification (Anti-Hallucination Guardrails)
 Ensures factual accuracy by validating LLM statements against source texts.
