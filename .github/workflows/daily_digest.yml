@@ -34,6 +34,8 @@ jobs:
           python -m pip install --upgrade pip
           pip install feedparser beautifulsoup4 requests
           pip install -r upsc-agent/requirements.txt
+          echo "=== Installed Python Packages ==="
+          pip list
 
       - name: Run UPSC News Scraper & Digest Agent
         env:
