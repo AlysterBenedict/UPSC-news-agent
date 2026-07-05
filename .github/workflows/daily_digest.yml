@@ -2,8 +2,8 @@ name: UPSC Daily Digest
 
 on:
   schedule:
-    # Run daily at 18:00 UTC (which is 11:30 PM IST / India Standard Time)
-    - cron: '0 18 * * *'
+    # Run daily at 16:30 UTC (which is 10:00 PM IST / India Standard Time)
+    - cron: '30 16 * * *'
   workflow_dispatch:
     # Allows manual trigger of the workflow from the Actions tab
 
