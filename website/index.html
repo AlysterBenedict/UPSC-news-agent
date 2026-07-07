@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UPSC Digest Agent — AI-Powered Daily Current Affairs Pipeline</title>
+    <meta name="description" content="A production-grade, multi-agent AI pipeline that aggregates 400+ daily news articles, deduplicates, analyzes for UPSC syllabus relevance, and generates premium A4 PDF digests. Powered by NVIDIA NIM and Llama-3.3.">
+    <meta name="keywords" content="UPSC, Current Affairs, AI Agent, News Digest, NVIDIA NIM, Llama-3.3, Multi-Agent Pipeline, LangGraph">
+    <meta name="author" content="Alyster Benedict">
+
+    <!-- Favicon -->
+    <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- ===== ANIMATED BACKGROUND ===== -->
+    <div class="bg-canvas">
+        <div class="bg-orb bg-orb--1"></div>
+        <div class="bg-orb bg-orb--2"></div>
+        <div class="bg-orb bg-orb--3"></div>
+    </div>
+    <div class="bg-grid"></div>
+
+    <!-- ===== NAVBAR ===== -->
+    <nav class="navbar" id="navbar">
+        <div class="navbar__inner">
+            <a href="#" class="navbar__brand">
+                <div class="navbar__icon">
+                    <img src="assets/favicon.ico" alt="UPSC Digest Icon">
+                </div>
+                <span class="navbar__title">UPSC Digest <span class="navbar__badge">AI</span></span>
+            </a>
+
+            <div class="navbar__links" id="navLinks">
+                <a href="#features">Features</a>
+                <a href="#pipeline">Pipeline</a>
+                <a href="#tech-stack">Tech Stack</a>
+                <a href="#output">Output</a>
+                <a href="#contact">Contact</a>
+                <a href="https://drive.google.com/file/d/1pR75kLPisPDE4tSU6Nn9oQ2ZwDqOUmFC/view?usp=drive_link" class="navbar__cta" target="_blank" rel="noopener noreferrer">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    Download App
+                </a>
+            </div>
+
+            <button class="navbar__toggle" id="navToggle" aria-label="Toggle navigation menu">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            </button>
+        </div>
+    </nav>
+
+
+    <!-- ===== HERO SECTION ===== -->
+    <section class="hero" id="hero">
+        <div class="hero__inner">
+            <div class="hero__content">
+                <div class="hero__pill">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M15 2v2"/><path d="M15 20v2"/><path d="M2 15h2"/><path d="M2 9h2"/><path d="M20 15h2"/><path d="M20 9h2"/><path d="M9 2v2"/><path d="M9 20v2"/></svg>
+                    Multi-Agent AI Pipeline
+                </div>
+
+                <h1 class="hero__heading">
+                    Daily UPSC News<br>
+                    <span class="gradient-text">Digest Agent</span>
+                </h1>
+
+                <p class="hero__desc">
+                    A production-grade, multi-agent system that scrapes 400+ articles daily, clusters duplicates using dense embeddings, runs UPSC syllabus analysis through NVIDIA Llama-3.3, and compiles verified content into a premium A4 PDF.
+                </p>
+
+                <div class="hero__actions">
+                    <a href="https://drive.google.com/file/d/1pR75kLPisPDE4tSU6Nn9oQ2ZwDqOUmFC/view?usp=drive_link" class="btn btn--primary" target="_blank" rel="noopener noreferrer">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        Download for Windows
+                    </a>
+                    <a href="#features" class="btn btn--ghost">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 16 16 12 12 8"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                        Explore Features
+                    </a>
+                </div>
+
+                <div class="hero__stats">
+                    <div>
+                        <div class="hero__stat-value">400+</div>
+                        <div class="hero__stat-label">Articles / Day</div>
+                    </div>
+                    <div>
+                        <div class="hero__stat-value">11</div>
+                        <div class="hero__stat-label">Pipeline Agents</div>
+                    </div>
+                    <div>
+                        <div class="hero__stat-value">~22 min</div>
+                        <div class="hero__stat-label">Full Execution</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Laptop Mockup -->
+            <div class="hero__visual">
+                <div class="laptop-mockup">
+                    <div class="laptop-screen">
+                        <div class="laptop-notch"></div>
+                        <img src="assets/app-ss.jpg" alt="UPSC Digest Agent Desktop Application">
+                        <!-- NVIDIA badge on laptop -->
+                        <div class="laptop-nvidia-badge">
+                            <img src="assets/nvidia.png" alt="NVIDIA">
+                            <span>Powered by NVIDIA NIM</span>
+                        </div>
+                    </div>
+                    <div class="laptop-base"></div>
+                    <div class="laptop-glow"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ===== FEATURES SECTION ===== -->
+    <div class="section__divider"></div>
+    <section class="section" id="features">
+        <div class="section__inner">
+            <div class="section__label">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                Core Features
+            </div>
+            <h2 class="section__heading">Intelligent News Processing<br>at Every Stage</h2>
+            <p class="section__desc">From real-time scraping to verified PDF generation — every step is orchestrated by specialized AI agents working in concert.</p>
+
+            <div class="features-grid stagger" id="featuresGrid">
+                <!-- Feature 1: Multi-Source Scraper -->
+                <div class="feature-card">
+                    <div class="feature-card__icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/></svg>
+                    </div>
+                    <h3 class="feature-card__title">Multi-Source Scraper</h3>
+                    <p class="feature-card__desc">Fetches articles from RSS feeds, HTML listing pages, and government JSON APIs across The Hindu, Indian Express, PIB, MEA, and more.</p>
+                    <div class="feature-card__tag">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/></svg>
+                        RSS + Listing + API
+                    </div>
+                </div>
+
+                <!-- Feature 2: Embedding Clustering -->
+                <div class="feature-card">
+                    <div class="feature-card__icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M13 6h3a2 2 0 0 1 2 2v7"/><path d="M11 18H8a2 2 0 0 1-2-2V9"/></svg>
+                    </div>
+                    <h3 class="feature-card__title">Dense Embedding Clustering</h3>
+                    <p class="feature-card__desc">Groups duplicate coverage of the same event using local sentence-transformer embeddings and agglomerative cosine-distance clustering.</p>
+                    <div class="feature-card__tag">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/></svg>
+                        all-MiniLM-L6-v2
+                    </div>
+                </div>
+
+                <!-- Feature 3: UPSC Syllabus Analysis -->
+                <div class="feature-card">
+                    <div class="feature-card__icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                    </div>
+                    <h3 class="feature-card__title">UPSC Syllabus Analysis</h3>
+                    <p class="feature-card__desc">Maps each article cluster to GS Papers 1-4 using the SCAN framework — Situation, Consequences, Alternatives, and Next Steps.</p>
+                    <div class="feature-card__tag">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                        SCAN Framework
+                    </div>
+                </div>
+
+                <!-- Feature 4: Anti-Hallucination -->
+                <div class="feature-card">
+                    <div class="feature-card__icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+                    </div>
+                    <h3 class="feature-card__title">Anti-Hallucination Guard</h3>
+                    <p class="feature-card__desc">Dual-gate verification validates every LLM claim against source text spans. Claims failing evidence matching are automatically purged.</p>
+                    <div class="feature-card__tag">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        Span-Level Attestation
+                    </div>
+                </div>
+
+                <!-- Feature 5: Crash-Resumable Pipeline -->
+                <div class="feature-card">
+                    <div class="feature-card__icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></svg>
+                    </div>
+                    <h3 class="feature-card__title">SQLite Checkpointing</h3>
+                    <p class="feature-card__desc">LangGraph persists the pipeline state to SQLite after every node. Crash? Resume from the exact last successful step — no re-running expensive LLM calls.</p>
+                    <div class="feature-card__tag">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+                        Crash Resumable
+                    </div>
+                </div>
+
+                <!-- Feature 6: Premium PDF -->
+                <div class="feature-card">
+                    <div class="feature-card__icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+                    </div>
+                    <h3 class="feature-card__title">Premium A4 PDF</h3>
+                    <p class="feature-card__desc">WeasyPrint renders print-optimized PDFs with CSS paged media, table of contents, running headers, page numbers, and clean editorial typography.</p>
+                    <div class="feature-card__tag">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="3" width="12" height="18" rx="2"/></svg>
+                        30-50 Pages
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ===== PIPELINE ARCHITECTURE ===== -->
+    <div class="section__divider"></div>
+    <section class="section" id="pipeline">
+        <div class="section__inner">
+            <div class="section__label">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M13 6h3a2 2 0 0 1 2 2v7"/><path d="M11 18H8a2 2 0 0 1-2-2V9"/></svg>
+                Pipeline Architecture
+            </div>
+            <h2 class="section__heading">11-Node Stateful Graph<br>Orchestration</h2>
+            <p class="section__desc">A LangGraph-powered directed acyclic graph manages the entire workflow — from scraping to email delivery — with deterministic fallbacks at every stage.</p>
+
+            <div class="pipeline-visual reveal" id="pipelineVisual">
+                <div class="pipeline-flow">
+                    <!-- Ingest -->
+                    <div class="pipeline-node">
+                        <div class="pipeline-node__icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/></svg>
+                        </div>
+                        <div>
+                            <div class="pipeline-node__title">Ingest</div>
+                            <div class="pipeline-node__sub">scraper_test.py</div>
+                        </div>
+                    </div>
+                    <div class="pipeline-arrow">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/></svg>
+                    </div>
+                    <!-- Normalize -->
+                    <div class="pipeline-node">
+                        <div class="pipeline-node__icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+                        </div>
+                        <div>
+                            <div class="pipeline-node__title">Normalize</div>
+                            <div class="pipeline-node__sub">normalize_app.py</div>
+                        </div>
+                    </div>
+                    <div class="pipeline-arrow">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/></svg>
+                    </div>
+                    <!-- Dedup -->
+                    <div class="pipeline-node">
+                        <div class="pipeline-node__icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><line x1="9" y1="14" x2="15" y2="14"/></svg>
+                        </div>
+                        <div>
+                            <div class="pipeline-node__title">Deduplicate</div>
+                            <div class="pipeline-node__sub">dedup_app.py</div>
+                        </div>
+                    </div>
+                    <div class="pipeline-arrow">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/></svg>
+                    </div>
+                    <!-- Analyze -->
+                    <div class="pipeline-node">
+                        <div class="pipeline-node__icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                        </div>
+                        <div>
+                            <div class="pipeline-node__title">Analyze</div>
+                            <div class="pipeline-node__sub">Llama-3.3 70B</div>
+                        </div>
+                    </div>
+                    <div class="pipeline-arrow">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/></svg>
+                    </div>
+                    <!-- Verify -->
+                    <div class="pipeline-node">
+                        <div class="pipeline-node__icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+                        </div>
+                        <div>
+                            <div class="pipeline-node__title">Verify</div>
+                            <div class="pipeline-node__sub">Anti-Hallucination</div>
+                        </div>
+                    </div>
+                    <div class="pipeline-arrow">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/></svg>
+                    </div>
+                    <!-- Render -->
+                    <div class="pipeline-node">
+                        <div class="pipeline-node__icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>
+                        </div>
+                        <div>
+                            <div class="pipeline-node__title">Render PDF</div>
+                            <div class="pipeline-node__sub">WeasyPrint A4</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pipeline details -->
+            <div style="margin-top: 48px;">
+                <div class="showcase">
+                    <div class="showcase__content reveal">
+                        <h3>Stateful LangGraph Orchestration</h3>
+                        <p>The entire pipeline runs as an 11-node stateful directed acyclic graph. Every transition is managed via a shared TypedDict state, with atomic SQLite checkpointing after each node execution.</p>
+                        <ul class="showcase__list">
+                            <li class="showcase__list-item">
+                                <span class="showcase__list-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                </span>
+                                Resume from any checkpoint after crash or power loss
+                            </li>
+                            <li class="showcase__list-item">
+                                <span class="showcase__list-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                </span>
+                                Pydantic v2 strict schema validation at every stage
+                            </li>
+                            <li class="showcase__list-item">
+                                <span class="showcase__list-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                </span>
+                                ThreadPoolExecutor parallel LLM inference for verification
+                            </li>
+                            <li class="showcase__list-item">
+                                <span class="showcase__list-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                </span>
+                                Deterministic fallback heuristics backstop every ML node
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="showcase__image reveal">
+                        <img src="assets/newspaper-ss.jpg" alt="UPSC Digest Newspaper Output Sample">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ===== TECH STACK SECTION ===== -->
+    <div class="section__divider"></div>
+    <section class="section" id="tech-stack">
+        <div class="section__inner">
+            <div class="section__label">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 2 7l10 5 10-5-10-5z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></svg>
+                Tech Stack
+            </div>
+            <h2 class="section__heading">Built With Industry-Grade<br>Technologies</h2>
+            <p class="section__desc">Every component is selected for production reliability — from LangGraph orchestration to local sentence-transformer embeddings and WeasyPrint rendering.</p>
+
+            <div class="tech-grid stagger" id="techGrid">
+                <div class="tech-item">
+                    <div class="tech-item__icon">
+                        <img src="assets/nvidia.png" alt="NVIDIA NIM">
+                    </div>
+                    <div class="tech-item__name">NVIDIA NIM</div>
+                    <div class="tech-item__role">LLM Inference</div>
+                </div>
+                <div class="tech-item">
+                    <div class="tech-item__icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M13 6h3a2 2 0 0 1 2 2v7"/><path d="M11 18H8a2 2 0 0 1-2-2V9"/></svg>
+                    </div>
+                    <div class="tech-item__name">LangGraph</div>
+                    <div class="tech-item__role">Orchestration</div>
+                </div>
+                <div class="tech-item">
+                    <div class="tech-item__icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                    </div>
+                    <div class="tech-item__name">Llama 3.3 70B</div>
+                    <div class="tech-item__role">Analysis & Verification</div>
+                </div>
+                <div class="tech-item">
+                    <div class="tech-item__icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                    </div>
+                    <div class="tech-item__name">Llama 3.1 8B</div>
+                    <div class="tech-item__role">Section Writing</div>
+                </div>
+                <div class="tech-item">
+                    <div class="tech-item__icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                    </div>
+                    <div class="tech-item__name">Sentence-Transformers</div>
+                    <div class="tech-item__role">Local Embeddings</div>
+                </div>
+                <div class="tech-item">
+                    <div class="tech-item__icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></svg>
+                    </div>
+                    <div class="tech-item__name">SQLite</div>
+                    <div class="tech-item__role">Checkpointing</div>
+                </div>
+                <div class="tech-item">
+                    <div class="tech-item__icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+                    </div>
+                    <div class="tech-item__name">WeasyPrint</div>
+                    <div class="tech-item__role">PDF Rendering</div>
+                </div>
+                <div class="tech-item">
+                    <div class="tech-item__icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                    </div>
+                    <div class="tech-item__name">PyWebView</div>
+                    <div class="tech-item__role">Desktop GUI</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ===== OUTPUT SECTION ===== -->
+    <div class="section__divider"></div>
+    <section class="section" id="output">
+        <div class="section__inner">
+            <div class="section__label">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+                Output
+            </div>
+            <h2 class="section__heading">Premium-Grade Study<br>Material Output</h2>
+            <p class="section__desc">The system generates comprehensive, print-ready UPSC current affairs digests that condense 600,000+ words into a structured 30-50 page study document.</p>
+
+            <div class="showcase showcase--reversed reveal">
+                <div class="showcase__image">
+                    <img src="assets/newspaper-ss.jpg" alt="Generated UPSC Digest PDF Preview">
+                </div>
+                <div class="showcase__content">
+                    <h3>What You Get</h3>
+                    <p>Each daily digest is a complete, structured study resource — organized by GS Paper categories, with verified facts, SCAN framework analysis, and revision-ready summaries.</p>
+                    <ul class="showcase__list">
+                        <li class="showcase__list-item">
+                            <span class="showcase__list-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            </span>
+                            Table of contents with page-break controlled sections
+                        </li>
+                        <li class="showcase__list-item">
+                            <span class="showcase__list-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            </span>
+                            GS 1-4 syllabus categorization with subtopic tagging
+                        </li>
+                        <li class="showcase__list-item">
+                            <span class="showcase__list-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            </span>
+                            Core facts, Prelims keywords, and Mains essay angles
+                        </li>
+                        <li class="showcase__list-item">
+                            <span class="showcase__list-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            </span>
+                            One-line revision summaries and key data points
+                        </li>
+                        <li class="showcase__list-item">
+                            <span class="showcase__list-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            </span>
+                            Print-optimized A4 layout with Georgia/Inter typography
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ===== DESKTOP APP SECTION ===== -->
+    <div class="section__divider"></div>
+    <section class="section" id="desktop-app">
+        <div class="section__inner">
+            <div class="section__label">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                Desktop Application
+            </div>
+            <h2 class="section__heading">Native Windows App<br>with Real-Time Console</h2>
+            <p class="section__desc">A standalone desktop application with a modern dark UI, live pipeline logging, and native file dialogs — packaged as a single EXE via PyInstaller.</p>
+
+            <div class="showcase reveal">
+                <div class="showcase__content">
+                    <h3>One-Click Pipeline Execution</h3>
+                    <p>The desktop GUI wraps the entire multi-agent pipeline in a beautiful, real-time interface. Just set your API key, pick a date, and watch the agents work.</p>
+                    <ul class="showcase__list">
+                        <li class="showcase__list-item">
+                            <span class="showcase__list-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            </span>
+                            Real-time console log streaming with 100ms batching
+                        </li>
+                        <li class="showcase__list-item">
+                            <span class="showcase__list-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            </span>
+                            Visual step-by-step pipeline progress tracker
+                        </li>
+                        <li class="showcase__list-item">
+                            <span class="showcase__list-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            </span>
+                            Native Windows save dialog for output location selection
+                        </li>
+                        <li class="showcase__list-item">
+                            <span class="showcase__list-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            </span>
+                            Auto self-install to Programs directory with Start Menu shortcut
+                        </li>
+                        <li class="showcase__list-item">
+                            <span class="showcase__list-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            </span>
+                            Secure API key management with local config.json storage
+                        </li>
+                    </ul>
+                </div>
+                <div class="showcase__image">
+                    <img src="assets/app-ss.jpg" alt="UPSC Digest Agent Desktop App Interface">
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ===== CTA / DOWNLOAD SECTION ===== -->
+    <div class="section__divider"></div>
+    <section class="cta-section" id="download">
+        <div class="cta__inner reveal">
+            <div class="section__label" style="margin-left: auto; margin-right: auto;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Download Now
+            </div>
+            <h2 class="cta__heading">Start Generating Your<br><span class="gradient-text">Daily UPSC Digest</span></h2>
+            <p class="cta__desc">Download the standalone Windows app, enter your NVIDIA NIM API key, and let the multi-agent pipeline handle the rest. Your first digest is minutes away.</p>
+
+            <div class="cta__actions">
+                <a href="https://drive.google.com/file/d/1pR75kLPisPDE4tSU6Nn9oQ2ZwDqOUmFC/view?usp=drive_link" class="btn btn--primary" target="_blank" rel="noopener noreferrer">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    Download for Windows
+                </a>
+                <a href="mailto:alynemoclaw@gmail.com" class="btn btn--ghost">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                    Contact Support
+                </a>
+            </div>
+
+            <div class="cta__powered">
+                <img src="assets/nvidia.png" alt="NVIDIA">
+                <span>Powered by NVIDIA NIM &middot; Llama-3.3-Nemotron 70B</span>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="footer" id="contact">
+        <div class="footer__inner">
+            <div class="footer__brand">
+                <div class="footer__brand-icon">
+                    <img src="assets/favicon.ico" alt="UPSC Digest Icon">
+                </div>
+                <span class="footer__brand-text">UPSC Digest Agent</span>
+            </div>
+
+            <div class="footer__links">
+                <a href="#features">Features</a>
+                <a href="#pipeline">Pipeline</a>
+                <a href="#tech-stack">Tech Stack</a>
+                <a href="mailto:alynemoclaw@gmail.com">alynemoclaw@gmail.com</a>
+            </div>
+
+            <div class="footer__copy">
+                &copy; 2026 Alyster Benedict &middot; Built with LangGraph, NVIDIA NIM, and Python
+            </div>
+        </div>
+    </footer>
+
+
+    <!-- ===== SCRIPTS ===== -->
+    <script src="script.js"></script>
+</body>
+</html>

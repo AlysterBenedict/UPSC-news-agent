@@ -28,3 +28,7 @@ scrape_report_*.txt
 zartifacts/
 upsc-app/dist/
 upsc-app/build/
+
+# Firebase cache
+.firebase/
+
