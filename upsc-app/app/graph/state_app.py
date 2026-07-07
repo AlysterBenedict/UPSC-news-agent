@@ -43,6 +43,7 @@ class DigestState(TypedDict, total=False):
     delivery_status: Optional[str]
     current_phase: str
     skip_delivery: bool
+    abort_reason: Optional[str]
 
     # Metrics and errors (errors accumulated via operator.add)
     metrics: dict

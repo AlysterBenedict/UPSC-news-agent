@@ -3,6 +3,9 @@ UPSC Daily Digest — LangGraph Workflow Definition
 ===================================================
 StateGraph with 10 nodes connected in a sequential pipeline.
 Supports checkpointing and resumability via SQLite.
+
+FIX: Added conditional routing after ingest and normalize nodes
+to fail fast when data is empty, preventing blank PDF generation.
 """
 
 from __future__ import annotations
@@ -27,13 +30,98 @@ from app.utils.logging_app import get_logger
 log = get_logger(__name__)
 
 
+# =============================================================================
+# ABORT NODE — Sets a clear error when the pipeline short-circuits
+# =============================================================================
+
+def abort_pipeline(state: dict) -> dict:
+    """Abort node: carries the failure reason to the final state."""
+    reason = state.get("abort_reason", "Pipeline aborted due to empty data.")
+    log.error("pipeline_aborted", reason=reason)
+    print(f"\n{'='*60}")
+    print(f"  [ABORT] Pipeline stopped: {reason}")
+    print(f"{'='*60}\n")
+    return {
+        "current_phase": "aborted",
+        "errors": [{
+            "phase": "pipeline",
+            "error_type": "pipeline_abort",
+            "message": reason,
+        }],
+    }
+
+
+# =============================================================================
+# CONDITIONAL ROUTERS — Check for empty data at critical points
+# =============================================================================
+
+def check_after_ingest(state: dict) -> str:
+    """Route after ingestion: continue if we have articles, abort if empty."""
+    articles = state.get("articles_raw", [])
+    phase = state.get("current_phase", "")
+
+    if not articles or phase == "ingestion_failed":
+        reason = state.get("abort_reason") or (
+            "Ingestion produced no articles. The scraper may have failed "
+            "or no scraped_articles JSON file was found for this date. "
+            "Check that the scraper ran successfully and produced output."
+        )
+        log.error("check_after_ingest_failed", article_count=len(articles), phase=phase)
+        return "abort"
+
+    log.info("check_after_ingest_ok", article_count=len(articles))
+    return "normalize"
+
+
+def check_after_normalize(state: dict) -> str:
+    """Route after normalization: continue if we have normalized articles, abort if empty."""
+    articles = state.get("articles_normalized", [])
+
+    if not articles:
+        log.error("check_after_normalize_failed", article_count=0)
+        return "abort_normalize"
+
+    log.info("check_after_normalize_ok", article_count=len(articles))
+    return "deduplicate"
+
+
+def abort_after_normalize(state: dict) -> dict:
+    """Abort node for normalization failure."""
+    reason = (
+        "Normalization produced no articles. All articles may have been "
+        "classified as irrelevant by the LLM, or the LLM API calls failed. "
+        "Check your NIM API key and network connection."
+    )
+    log.error("pipeline_aborted_after_normalize", reason=reason)
+    print(f"\n{'='*60}")
+    print(f"  [ABORT] Pipeline stopped: {reason}")
+    print(f"{'='*60}\n")
+    return {
+        "current_phase": "aborted",
+        "abort_reason": reason,
+        "errors": [{
+            "phase": "normalize",
+            "error_type": "pipeline_abort",
+            "message": reason,
+        }],
+    }
+
+
+# =============================================================================
+# WORKFLOW BUILDER
+# =============================================================================
+
 def build_workflow(checkpoint_db_path: str | None = None) -> StateGraph:
     """
     Build the UPSC Digest LangGraph workflow.
 
     Pipeline:
-    START → ingest → normalize → deduplicate → analyze → verify
-          → map_upsc → write_sections → assemble → render → deliver → audit → END
+    START → ingest → [check] → normalize → [check] → deduplicate → analyze
+          → verify → map_upsc → write_sections → assemble → render
+          → deliver → audit → END
+
+    FIX: Conditional edges after ingest and normalize abort the pipeline
+    when data is empty, instead of cascading empty data through all nodes.
     """
     # Build the graph
     workflow = StateGraph(DigestState)
@@ -51,10 +139,28 @@ def build_workflow(checkpoint_db_path: str | None = None) -> StateGraph:
     workflow.add_node("deliver", deliver_digest)
     workflow.add_node("audit", generate_audit_report)
 
-    # Define edges (sequential pipeline)
+    # Abort nodes for clean short-circuit
+    workflow.add_node("abort", abort_pipeline)
+    workflow.add_node("abort_normalize", abort_after_normalize)
+
+    # Define edges with conditional routing at critical checkpoints
     workflow.add_edge(START, "ingest")
-    workflow.add_edge("ingest", "normalize")
-    workflow.add_edge("normalize", "deduplicate")
+
+    # FIX: After ingestion, check if we have articles before continuing
+    workflow.add_conditional_edges(
+        "ingest",
+        check_after_ingest,
+        {"normalize": "normalize", "abort": "abort"},
+    )
+
+    # FIX: After normalization, check if we have normalized articles
+    workflow.add_conditional_edges(
+        "normalize",
+        check_after_normalize,
+        {"deduplicate": "deduplicate", "abort_normalize": "abort_normalize"},
+    )
+
+    # Remaining sequential edges
     workflow.add_edge("deduplicate", "analyze")
     workflow.add_edge("analyze", "verify")
     workflow.add_edge("verify", "map_upsc")
@@ -64,6 +170,10 @@ def build_workflow(checkpoint_db_path: str | None = None) -> StateGraph:
     workflow.add_edge("render", "deliver")
     workflow.add_edge("deliver", "audit")
     workflow.add_edge("audit", END)
+
+    # Abort nodes go directly to END
+    workflow.add_edge("abort", END)
+    workflow.add_edge("abort_normalize", END)
 
     return workflow
 
@@ -132,6 +242,7 @@ def run_workflow(
         "skip_delivery": skip_delivery,
         "metrics": {},
         "errors": [],
+        "abort_reason": None,
     }
 
     # Compile and run

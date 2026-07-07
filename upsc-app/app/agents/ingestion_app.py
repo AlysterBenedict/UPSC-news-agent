@@ -7,6 +7,8 @@ Reads scraper JSON output, validates schemas, creates run_id.
 from __future__ import annotations
 
 import hashlib
+import os
+import time
 import uuid
 from datetime import datetime
 from pathlib import Path
@@ -41,6 +43,7 @@ def ingest_articles(state: dict) -> dict:
     """
     run_date = state.get("run_date", get_today_str())
     scraper_dir = Path(state.get("scraper_output_dir", "../")).resolve()
+    scraper_dir.mkdir(parents=True, exist_ok=True)  # FIX: Ensure dir exists before using as subprocess CWD
     run_id = state.get("run_id", generate_run_id(run_date))
     skip_scrape = state.get("skip_scrape", False)
 
@@ -83,6 +86,10 @@ def ingest_articles(state: dict) -> dict:
                 if run_date:
                     cmd.extend(["--date", run_date])
 
+                # FIX: Explicitly pass environment to ensure SCRAPER_OUTPUT_DIR
+                # and other variables are inherited by the subprocess
+                env = os.environ.copy()
+
                 process = subprocess.Popen(
                     cmd,
                     cwd=str(scraper_dir),
@@ -91,11 +98,25 @@ def ingest_articles(state: dict) -> dict:
                     text=True,
                     bufsize=1,
                     encoding="utf-8",
-                    errors="replace"
+                    errors="replace",
+                    env=env,
                 )
+                
+                # FIX: Add timeout to prevent infinite blocking if the scraper hangs
+                SCRAPER_TIMEOUT = 900  # 15 minutes
+                start_time = time.time()
                 
                 # Stream the scraper output to sys.stdout in real-time
                 while True:
+                    # Check timeout before reading
+                    elapsed = time.time() - start_time
+                    if elapsed > SCRAPER_TIMEOUT:
+                        log.error("scraper_timeout", elapsed=elapsed, timeout=SCRAPER_TIMEOUT)
+                        print(f"\n[WARN] Scraper timed out after {SCRAPER_TIMEOUT}s. Killing process...")
+                        process.kill()
+                        process.wait()
+                        break
+
                     line = process.stdout.readline()
                     if not line and process.poll() is not None:
                         break
@@ -127,11 +148,18 @@ def ingest_articles(state: dict) -> dict:
                 message=f"No scraper output found for {run_date} in {scraper_dir}",
             )
             log.error("scraper_output_missing", date=run_date, dir=str(scraper_dir))
+            # FIX: Set abort_reason so the workflow conditional routing can
+            # abort the pipeline instead of cascading empty data through all nodes
             return {
                 "run_id": run_id,
                 "run_date": run_date,
                 "errors": [error.model_dump()],
                 "current_phase": "ingestion_failed",
+                "abort_reason": (
+                    f"No scraper output found for {run_date} in {scraper_dir}. "
+                    f"The scraper may have failed or produced no articles. "
+                    f"Try running the scraper manually first, or check your network connection."
+                ),
             }
 
     log.info("scraper_file_found", path=str(scraper_file))

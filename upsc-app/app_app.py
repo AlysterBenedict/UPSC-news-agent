@@ -146,7 +146,16 @@ class LogEmitter:
     FIX: Uses time-based batching with a minimum interval (100ms) to prevent
     flooding evaluate_js with hundreds of rapid log lines. Also protects
     against window being destroyed mid-dispatch.
+    FIX: Provides standard stream attributes (encoding, name, errors, etc.)
+    that libraries like structlog, weasyprint, and beautifulsoup4 may inspect.
     """
+    # Standard stream attributes for library compatibility
+    encoding = "utf-8"
+    name = "<logEmitter>"
+    errors = "replace"
+    newlines = None
+    mode = "w"
+
     def __init__(self, window):
         self.window = window
         self.original_stdout = sys.stdout
@@ -171,6 +180,19 @@ class LogEmitter:
             self.original_stdout.flush()
 
     def isatty(self):
+        return False
+
+    def fileno(self):
+        import io
+        raise io.UnsupportedOperation("LogEmitter does not use a file descriptor")
+
+    def writable(self):
+        return True
+
+    def readable(self):
+        return False
+
+    def seekable(self):
         return False
 
     def _dispatch_loop(self):
@@ -332,15 +354,29 @@ class ApiBridge:
             output_dir = os.path.join(app_dir, "output")
             data_dir = os.path.join(app_dir, "data")
             db_path = os.path.join(data_dir, "checkpoints.db")
-            
-            os.makedirs(output_dir, exist_ok=True)
-            os.makedirs(data_dir, exist_ok=True)
-            
-            os.environ["NIM_API_KEY"] = api_key
             if getattr(sys, 'frozen', False):
                 scraper_output_dir = os.path.join(app_dir, "zartifacts")
             else:
                 scraper_output_dir = os.path.join(os.path.dirname(app_dir), "zartifacts")
+            
+            os.makedirs(output_dir, exist_ok=True)
+            os.makedirs(data_dir, exist_ok=True)
+            os.makedirs(scraper_output_dir, exist_ok=True)
+
+            # FIX: Clean stale SQLite checkpoint WAL/SHM files from previously
+            # force-closed sessions to prevent lock contention
+            for stale_ext in (".db-wal", ".db-shm"):
+                stale_file = db_path + stale_ext.replace(".db", "")
+                # Construct proper path: checkpoints.db-wal, checkpoints.db-shm
+                stale_path = db_path + stale_ext[3:]  # "-wal" or "-shm"
+                try:
+                    if os.path.exists(stale_path) and os.path.getsize(stale_path) > 0:
+                        os.remove(stale_path)
+                        print(f"[SYSTEM] Cleaned stale checkpoint file: {os.path.basename(stale_path)}")
+                except OSError:
+                    pass  # File may be locked; proceed anyway
+
+            os.environ["NIM_API_KEY"] = api_key
             os.environ["SCRAPER_OUTPUT_DIR"] = scraper_output_dir
             os.environ["OUTPUT_DIR"] = output_dir
             os.environ["DATA_DIR"] = data_dir
@@ -371,6 +407,23 @@ class ApiBridge:
             )
 
             # 7. Handle output
+            # FIX: Check if the pipeline was aborted before looking for output files
+            abort_reason = final_state.get("abort_reason")
+            current_phase = final_state.get("current_phase", "")
+
+            if abort_reason or current_phase == "aborted":
+                error_msg = abort_reason or "Pipeline was aborted due to empty data at an early stage."
+                # Also include any accumulated error messages
+                errors = final_state.get("errors", [])
+                if errors:
+                    error_details = "; ".join(
+                        e.get("message", "")[:100] for e in errors if isinstance(e, dict)
+                    )
+                    if error_details:
+                        error_msg = f"{error_msg} Details: {error_details}"
+                self.window.evaluate_js(f"window.onPipelineComplete(false, {json.dumps(error_msg)})")
+                return
+
             pdf_output = final_state.get("compiled_pdf_path")
             
             if pdf_output and os.path.exists(pdf_output):
