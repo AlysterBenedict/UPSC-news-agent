@@ -74,7 +74,7 @@ Extracts academic context from news clusters using LLMs.
   * **Situation (S):** Traces underlying structural problems and systemic root causes.
   * **Consequences (C):** Examines 360-degree impact on multiple stakeholders, focusing on vulnerable groups.
   * **Alternatives (A):** Weighs alternative public policy options and trade-offs.
-  * **Next Step (N):** Outlines a timeline-oriented action plan (Short, Mid, Long term) from a public administrator's perspective.
+  * **Next Step (N):** Outlines a timeline oriented action plan (Short, Mid, Long term) from a public administrator's perspective.
 
 ### 6. Dual-Gate Verification (Anti-Hallucination Guardrails)
 Ensures factual accuracy by validating LLM statements against source texts.
