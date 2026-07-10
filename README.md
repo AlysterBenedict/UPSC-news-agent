@@ -22,7 +22,7 @@ Scraper Output (400+ articles/day)
 │                                                                   │
 │  ✓ Persistent SQLite Checkpointing (Resume from any step)         │
 │  ✓ Dual-Gate Anti-Hallucination Self-Critique                     │
-│  ✓ Cosine Similarity Embedding Clustering (sentence-transformers)  │
+│  ✓ Cosine Similarity Embedding Clustering (sentence-transformers) │
 │  ✓ Source Provenance Traceability                                 │
 └───────────────────────────────────────────────────────────────────┘
          │
