@@ -26,10 +26,10 @@ class Settings(BaseSettings):
         default="nvidia/nemotron-3-super-120b-a12b", alias="NIM_MODEL"
     )
     nim_model_fast: str = Field(
-        default="nvidia/nemotron-3.5-lightning-30b-a3b", alias="NIM_MODEL_FAST"
+        default="openai/gpt-oss-20b", alias="NIM_MODEL_FAST"
     )
     nim_model_classifier: str = Field(
-        default="nvidia/nemotron-3.5-lightning-30b-a3b", alias="NIM_MODEL_CLASSIFIER"
+        default="openai/gpt-oss-20b", alias="NIM_MODEL_CLASSIFIER"
     )
 
     # --- Email ---

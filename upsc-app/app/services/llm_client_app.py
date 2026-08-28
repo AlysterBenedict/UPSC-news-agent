@@ -77,7 +77,8 @@ class LLMClient:
                 if response.usage:
                     self.total_tokens += response.usage.total_tokens
 
-                content = response.choices[0].message.content or ""
+                msg = response.choices[0].message
+                content = msg.content or getattr(msg, "reasoning_content", None) or getattr(msg, "reasoning", None) or ""
                 log.info(
                     "llm_call_success",
                     attempt=attempt,
