@@ -1,16 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UPSC Digest Agent</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap"
+        rel="stylesheet">
     <!-- Lucide Icons CDN for proper icon usage instead of emojis -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="stylesheet" href="style_app.css">
 </head>
+
 <body>
     <!-- Background visual effects -->
     <div class="bg-glow bg-glow-1"></div>
@@ -45,7 +49,9 @@
                     MULTI-AGENT PIPELINE
                 </div>
                 <h2 class="main-title">Daily UPSC News Digest <br><span class="highlight-text">AI Generator</span></h2>
-                <p class="main-subtitle">A sophisticated multi-agent pipeline that crawls RSS feeds, clusters key articles, and utilizes Llama-3.3-Nemotron to compile daily current affairs analyses for UPSC preparation.</p>
+                <p class="main-subtitle">A sophisticated multi-agent pipeline that crawls RSS feeds, clusters key
+                    articles, and utilizes Nemotron-3 Super & Nemotron-3.5 Lightning to compile daily current affairs analyses for UPSC
+                    preparation.</p>
             </div>
 
             <!-- SECTION 1: API KEY SETUP -->
@@ -117,9 +123,13 @@
                 </div>
 
                 <div class="card-tags">
-                    <span class="card-tag"><i data-lucide="brain" style="width:11px;height:11px;vertical-align:-1px;margin-right:3px;"></i>NVIDIA Llama</span>
-                    <span class="card-tag"><i data-lucide="git-branch" style="width:11px;height:11px;vertical-align:-1px;margin-right:3px;"></i>Multi-Agent</span>
-                    <span class="card-tag"><i data-lucide="shield-check" style="width:11px;height:11px;vertical-align:-1px;margin-right:3px;"></i>Encrypted Key</span>
+                    <span class="card-tag"><i data-lucide="brain"
+                            style="width:11px;height:11px;vertical-align:-1px;margin-right:3px;"></i>Nemotron Models</span>
+                    <span class="card-tag"><i data-lucide="git-branch"
+                            style="width:11px;height:11px;vertical-align:-1px;margin-right:3px;"></i>Multi-Agent</span>
+                    <span class="card-tag"><i data-lucide="shield-check"
+                            style="width:11px;height:11px;vertical-align:-1px;margin-right:3px;"></i>Encrypted
+                        Key</span>
                 </div>
             </section>
 
@@ -134,10 +144,11 @@
                             <h2>Generate Daily Digest</h2>
                             <p>Select a date to trigger the multi-agent scraping and reasoning workflow.</p>
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="dateInput">
-                                <i data-lucide="calendar" style="width:11px;height:11px;vertical-align:-1px;margin-right:3px;"></i>
+                                <i data-lucide="calendar"
+                                    style="width:11px;height:11px;vertical-align:-1px;margin-right:3px;"></i>
                                 Target Date
                             </label>
                             <input type="date" id="dateInput" class="date-picker-input">
@@ -197,7 +208,8 @@
                     <div class="dashboard-right">
                         <div class="connection-status-card">
                             <h3>
-                                <i data-lucide="server" style="width:14px;height:14px;vertical-align:-2px;margin-right:6px;"></i>
+                                <i data-lucide="server"
+                                    style="width:14px;height:14px;vertical-align:-2px;margin-right:6px;"></i>
                                 Agent Information
                             </h3>
                             <div class="status-row">
@@ -210,7 +222,7 @@
                             </div>
                             <div class="status-row">
                                 <span class="lbl">Model:</span>
-                                <span class="val">Llama-3.3-Nemotron</span>
+                                <span class="val">Nemotron-3-Super 120B</span>
                             </div>
                             <button id="deleteKeyBtn" class="btn btn-danger btn-sm">
                                 <i data-lucide="unplug" style="width:13px;height:13px;"></i>
@@ -308,10 +320,11 @@
                 </div>
                 <h2 class="text-glow">Digest Compiled Successfully!</h2>
                 <p class="success-desc">The UPSC Daily Digest has been processed and saved to your local machine.</p>
-                
+
                 <div class="path-display-box">
                     <span class="path-label">
-                        <i data-lucide="folder-open" style="width:12px;height:12px;vertical-align:-1px;margin-right:3px;"></i>
+                        <i data-lucide="folder-open"
+                            style="width:12px;height:12px;vertical-align:-1px;margin-right:3px;"></i>
                         File Path:
                     </span>
                     <span id="pdfPathText" class="path-val">C:\Users\...\Desktop\upsc_digest.pdf</span>
@@ -338,9 +351,10 @@
     <script src="script_app.js"></script>
     <script>
         // Initialize Lucide icons after DOM load
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             if (window.lucide) lucide.createIcons();
         });
     </script>
 </body>
+
 </html>

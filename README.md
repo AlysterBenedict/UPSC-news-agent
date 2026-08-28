@@ -61,7 +61,7 @@ Groups related articles covering the same event into unique topic clusters.
 * **Agglomerative Clustering:** Performs clustering with an average-linkage metric using a cosine distance threshold of `0.35` (cosine similarity > `0.65`).
 * **Primary Source Selection:** Identifies the longest article as the primary source, appending unique paragraphs from supporting articles to form a single combined cluster text.
 
-### 5. Structured UPSC Analysis (NVIDIA NIM Llama 3.3)
+### 5. Structured UPSC Analysis (NVIDIA NIM Nemotron-3 Super 120B)
 Extracts academic context from news clusters using LLMs.
 * **Syllabus Mapping:** Classifies clusters against the UPSC Civil Services Syllabus (GS Paper 1, 2, 3, or 4) and tags relevant subtopics.
 * **UPSC Extraction:** Formulates structured JSON outputs (`AnalysisUnit`) capturing:
@@ -82,10 +82,10 @@ Ensures factual accuracy by validating LLM statements against source texts.
 * **Verification Scoring:** Labels each claim with a verification status (`pass`, `partial`, `fail`).
 * **Source Mapping:** Requires the LLM to identify the exact source text span that supports the claim. If a claim fails verification, it is deleted from the final report.
 
-### 7. Syllabus Mapping & Section Writing (Jinja2 & NIM Llama 3.1)
+### 7. Syllabus Mapping & Section Writing (Jinja2 & NIM Nemotron-3.5 Lightning)
 Synthesizes verified inputs into cohesive study materials.
 * **Routing:** Maps verified units to subject categories (National, International Relations, Economy, Opinion, etc.).
-* **Section Prose Generation:** Uses Llama 3.1 to rewrite batches of 8-12 articles into cohesive, analytical sections. The output is structured to mirror UPSC answers: objective, crisp, and focused on policy implications.
+* **Section Prose Generation:** Uses Nemotron-3.5 Lightning (30B) to rewrite batches of 8-12 articles into cohesive, analytical sections. The output is structured to mirror UPSC answers: objective, crisp, and focused on policy implications.
 
 ### 8. Premium A4 PDF Rendering (WeasyPrint)
 Generates print-ready PDFs from the compiled HTML.
@@ -112,7 +112,7 @@ Packages the desktop app for simple deployment.
 | Component        | Technology                                       |
 |------------------|--------------------------------------------------|
 | **Orchestration** | LangGraph (Stateful graph with SQLite checkpointer) |
-| **LLM Inference** | NVIDIA NIM API (Llama 3.3 70B & Llama 3.1 8B)     |
+| **LLM Inference** | NVIDIA NIM API (`nvidia/nemotron-3-super-120b-a12b` & `nvidia/nemotron-3.5-lightning-30b-a3b`) |
 | **Local Embeddings** | Sentence-Transformers (`all-MiniLM-L6-v2`)     |
 | **Clustering**   | Scikit-Learn `AgglomerativeClustering`          |
 | **Validation**   | Pydantic v2                                      |

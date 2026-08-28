@@ -25,7 +25,7 @@ class LLMClient:
         self,
         api_key: str,
         base_url: str = "https://integrate.api.nvidia.com/v1",
-        model: str = "nvidia/llama-3.3-nemotron-super-49b-v1",
+        model: str = "nvidia/nemotron-3-super-120b-a12b",
         max_retries: int = 3,
         timeout: int = 120,
         delay: float = 1.0,

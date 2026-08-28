@@ -23,13 +23,13 @@ class Settings(BaseSettings):
         default="https://integrate.api.nvidia.com/v1", alias="NIM_BASE_URL"
     )
     nim_model: str = Field(
-        default="nvidia/llama-3.3-nemotron-super-49b-v1", alias="NIM_MODEL"
+        default="nvidia/nemotron-3-super-120b-a12b", alias="NIM_MODEL"
     )
     nim_model_fast: str = Field(
-        default="meta/llama-3.1-8b-instruct", alias="NIM_MODEL_FAST"
+        default="nvidia/nemotron-3.5-lightning-30b-a3b", alias="NIM_MODEL_FAST"
     )
     nim_model_classifier: str = Field(
-        default="meta/llama-3.1-8b-instruct", alias="NIM_MODEL_CLASSIFIER"
+        default="nvidia/nemotron-3.5-lightning-30b-a3b", alias="NIM_MODEL_CLASSIFIER"
     )
 
     # --- Email ---

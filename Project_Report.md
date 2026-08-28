@@ -29,7 +29,7 @@ Where $N \ge 400$ articles and average analytical parsing time per article $t_a 
 This project presents the design and implementation of an automated, local-first, agentic data pipeline that:
 1. **Aggregates Multi-Source Feeds:** Ingests raw RSS, listing index web pages, and government JSON APIs.
 2. **Performs Dense Embedding Clustering:** Groups duplicate coverage of identical macroeconomic or geopolitical events with zero external API calls.
-3. **Generates Structured Analyses:** Extracts administrative summaries using a localized Llama-3.3-70B model.
+3. **Generates Structured Analyses:** Extracts administrative summaries using a localized Nemotron-3 Super (`nvidia/nemotron-3-super-120b-a12b`) model.
 4. **Enforces Dual-Gate Anti-Hallucination Guardrails:** Validates generated claims by executing span-level text matching against raw source articles.
 5. **Renders Print-Ready Media:** Compiles and emails a premium A4 PDF formatted according to official publishing standards.
 
@@ -164,7 +164,7 @@ To prevent redundant news analysis, the pipeline implements dense vector embeddi
      `[Additional source: SourceName] ...`
 
 ### **3.3 Structured UPSC Analysis (`analyze` node)**
-The consolidated cluster text is processed by a local instance of **Llama-3.3-70B** hosted on LM Studio.
+The consolidated cluster text is processed by **Nemotron-3 Super** (`nvidia/nemotron-3-super-120b-a12b`).
 * **JSON Schema Enforcement:** Enforces JSON compilation via the API payload (`response_format = {"type": "json_object"}`), mapping outputs to the `AnalysisUnit` Pydantic model.
 * **Analysis Criteria:** The prompt instructs the LLM to process current affairs through three distinct lenses:
   * **Governance Lens:** Focuses on target beneficiaries, implementation challenges, and program evaluation.
@@ -197,8 +197,8 @@ class AnalysisUnit(BaseModel):
 ```
 
 ### **3.4 Dual-Gate Verification Node (`verify` node)**
-To prevent LLM hallucination, a verification agent processes each `AnalysisUnit` using a localized **Llama-3.3-70B** instance running in parallel:
-1. **Parallel Execution:** Employs a Python `ThreadPoolExecutor` to handle concurrent HTTP requests to the local LM Studio instance:
+To prevent LLM hallucination, a verification agent processes each `AnalysisUnit` using **Nemotron-3 Super** (`nvidia/nemotron-3-super-120b-a12b`) running in parallel:
+1. **Parallel Execution:** Employs a Python `ThreadPoolExecutor` to handle concurrent HTTP requests to the LLM endpoint:
    ```python
    with ThreadPoolExecutor(max_workers=settings.CONCURRENT_WORKERS) as executor:
        futures = {executor.submit(verify_single_unit, unit): unit for unit in pending_units}
@@ -213,7 +213,7 @@ To prevent LLM hallucination, a verification agent processes each `AnalysisUnit`
 
 ### **3.5 Routing, Section Writing & Document Assembly (`map_upsc`, `write_sections` & `assemble` nodes)**
 * **Syllabus Mapping:** Standardizes the taxonomy by grouping verified units under the correct `GSPaper` enum classifications (`GS1`, `GS2`, `GS3`, `GS4`).
-* **Section Prose Writer:** Batches of 8-12 mapped units are sent to a local **Llama-3.1-8B** instance to compose analytical prose sections that mirror the structural layout of UPSC model answers.
+* **Section Prose Writer:** Batches of 8-12 mapped units are sent to **Nemotron-3.5 Lightning** (`nvidia/nemotron-3.5-lightning-30b-a3b`) to compose analytical prose sections that mirror the structural layout of UPSC model answers.
 * **Document Assembler:** Gathers the written sections and parses them through a custom Jinja2 engine, compiling the output into a single styled HTML file containing a table of contents and page break controllers.
 
 ### **3.6 Print CSS Rendering & SMTP Delivery (`render` & `deliver` nodes)**
@@ -246,18 +246,18 @@ To prevent LLM hallucination, a verification agent processes each `AnalysisUnit`
 
 ## 4. Security, Isolation & Offline Operations
 
-Using local LLMs via LM Studio addresses common security vulnerabilities associated with cloud-hosted AI architectures.
+Using NVIDIA NIM LLM endpoints ensures robust and private inference.
 
 ```
 ┌────────────────────────────────────────────────────────┐
 │                   LOCAL WORKSTATION                    │
 │                                                        │
 │   ┌─────────────────────┐       ┌──────────────────┐   │
-│   │  LangGraph Engine   │ <───> │    LM Studio     │   │
-│   │  (Isolated Sandbox) │  API  │ (Local Server)   │   │
-│   └─────────────────────┘       │                  │   │
-│              │                  │ Llama-3.3-70B    │   │
-│              ▼                  │ Llama-3.1-8B     │   │
+│   │  LangGraph Engine   │ <───> │  NVIDIA NIM API  │   │
+│   │  (Isolated Sandbox) │  API  │                  │   │
+│   └─────────────────────┘       │ Nemotron-3 Super │   │
+│              │                  │ 120B & Nemotron- │   │
+│              ▼                  │ 3.5 Lightning 30B│   │
 │      [checkpoints.db]           └──────────────────┘   │
 │       (SQLite Local)                                   │
 └────────────────────────────────────────────────────────┘
