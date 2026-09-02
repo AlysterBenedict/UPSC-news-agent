@@ -179,14 +179,14 @@ YOUR OUTPUT FORMAT — for each editorial, produce EXACTLY this HTML structure:
   <p><strong>Key Points:</strong> 2-3 most important arguments or evidence points from the editorial. Use bullet format with <em>•</em> separators.</p>
   <p><strong>Counter:</strong> Alternative perspective or limitation acknowledged in the piece, in 1 sentence.</p>
 
-  <!-- SCAN Analysis Box -->
+  <!-- SCAN Analysis Box (Keep each point concise to fit cleanly inside this card) -->
   <div class="scan-analysis-box">
     <strong>SCAN Analysis:</strong>
     <ul>
-      <li><span class="scan-label scan-s">S — Situation:</span> [Dig below the surface level. Identify the underlying structural problem and systemic root causes]</li>
-      <li><span class="scan-label scan-c">C — Consequences:</span> [Map out a 360-degree view of how the event or policy impacts multiple stakeholders—especially vulnerable groups like salaried middle class, senior citizens, or small businesses]</li>
-      <li><span class="scan-label scan-a">A — Alternatives:</span> [Weigh choices and analyze what else could have been done, acknowledging the trade-offs and selecting the better public administration option]</li>
-      <li><span class="scan-label scan-n">N — Next Step:</span> [Structured timeline-oriented action plan. Explicit steps to execute in the short, mid, and long term as if you were the Officer-in-Charge or District Magistrate (DM)]</li>
+      <li><span class="scan-label scan-s">S — Situation:</span> [Dig below surface level. Identify systemic root cause in 1-2 concise lines]</li>
+      <li><span class="scan-label scan-c">C — Consequences:</span> [360-degree impact on key stakeholders / vulnerable groups in 1-2 concise lines]</li>
+      <li><span class="scan-label scan-a">A — Alternatives:</span> [Weigh choices, policy trade-offs, and administrative options in 1-2 concise lines]</li>
+      <li><span class="scan-label scan-n">N — Next Step:</span> [Short/mid/long-term actionable roadmap as Officer-in-Charge in 1-2 concise lines]</li>
     </ul>
   </div>
 
@@ -198,11 +198,11 @@ ABSOLUTE RULES:
 2. Start with `<div class="brief-card">` immediately. Output NOTHING before the first tag.
 3. End with the last `</div>` tag. Output NOTHING after.
 4. Use ONLY HTML tags. No markdown syntax.
-5. Maximum 220 words per editorial card, keeping the SCAN analysis concise.
+5. Maximum 220 words per editorial card total, keeping the SCAN analysis punchy and concise so the entire card stays self-contained.
 6. STATE ONLY WHAT THE SOURCE SAYS. Do NOT add your own arguments or analysis.
-7. The <p class="gs-tag"> line is MANDATORY.
+7. The <p class="gs-tag"> line is MANDATORY and must be placed inside the `<div class="brief-card">`.
 8. For Counter: if the editorial doesn't present a counterview, write "Not addressed in the piece."
-9. SCAN Method: The `scan-analysis-box` MUST be populated for every editorial, following the SCAN structure (Situation, Consequences, Alternatives, Next Step) to build the required administrative mindset.
+9. SCAN Method: The `scan-analysis-box` MUST be populated for every editorial inside its parent `<div class="brief-card">`, following the SCAN structure (Situation, Consequences, Alternatives, Next Step) to build the required administrative mindset.
 10. Reasoning Lens: Dissect the logic and framework of reasoning. Show how experts frame arguments, address counter-arguments, and defend their perspective.
 11. Strict Exclusions: Exclude regional/local crime and sensationalism. Focus on systemic, structural, and administrative takeaways.
 

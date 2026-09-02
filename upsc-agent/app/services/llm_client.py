@@ -249,7 +249,7 @@ class LLMClient:
             system_prompt=system_prompt,
             user_prompt=user_prompt,
             temperature=0.1,
-            max_tokens=512,
+            max_tokens=1024,
         )
         return {
             "relevant": bool(result.get("relevant", True)),
