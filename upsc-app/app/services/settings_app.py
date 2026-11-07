@@ -32,13 +32,13 @@ class Settings(BaseSettings):
         default="https://integrate.api.nvidia.com/v1", alias="NIM_BASE_URL"
     )
     nim_model: str = Field(
-        default="nvidia/nemotron-3-super-120b-a12b", alias="NIM_MODEL"
+        default="nvidia/nemotron-3-ultra-550b-a55b", alias="NIM_MODEL"
     )
     nim_model_fast: str = Field(
-        default="openai/gpt-oss-20b", alias="NIM_MODEL_FAST"
+        default="nvidia/nemotron-3-ultra-550b-a55b", alias="NIM_MODEL_FAST"
     )
     nim_model_classifier: str = Field(
-        default="openai/gpt-oss-20b", alias="NIM_MODEL_CLASSIFIER"
+        default="nvidia/nemotron-3-ultra-550b-a55b", alias="NIM_MODEL_CLASSIFIER"
     )
 
     # --- Email ---
@@ -66,7 +66,7 @@ class Settings(BaseSettings):
 
     # --- Processing ---
     analysis_batch_size: int = Field(default=1, alias="ANALYSIS_BATCH_SIZE")
-    writer_batch_size: int = Field(default=10, alias="WRITER_BATCH_SIZE")
+    writer_batch_size: int = Field(default=3, alias="WRITER_BATCH_SIZE")
     llm_delay_seconds: float = Field(default=0.0, alias="LLM_DELAY_SECONDS")
     llm_max_retries: int = Field(default=3, alias="LLM_MAX_RETRIES")
     llm_timeout: int = Field(default=120, alias="LLM_TIMEOUT")

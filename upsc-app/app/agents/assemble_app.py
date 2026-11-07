@@ -38,10 +38,10 @@ def _renumber_articles(html: str) -> str:
         title_rest = match.group(3)
         return f"{prefix}<h3{h3_attrs}>{counter[0]}. {title_rest}"
 
-    # Match optional anchor + <h3> + number prefix
-    # Pattern: (optional <a id="..."></a>)<h3 ...>\d+\.\s*rest of title
+    # Match optional anchor + <h3> + optional number prefix
+    # Pattern: (optional <a id="..."></a>)<h3 ...>(?:\d+\.\s*)?rest of title
     return re.sub(
-        r'(<a\s+id="[^"]*"></a>)?\s*<h3([^>]*)>\s*\d+\.\s*(.*?)(?=</h3>|<)',
+        r'(<a\s+id="[^"]*"></a>)?\s*<h3([^>]*)>\s*(?:\d+\.\s*)?(.*?)(?=</h3>|<)',
         _replace_number,
         html,
         flags=re.IGNORECASE,

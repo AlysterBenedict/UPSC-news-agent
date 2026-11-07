@@ -256,9 +256,16 @@ def clean_html_fragment(text: str) -> str:
     # Trim whitespace
     text = text.strip()
 
+    # Strip thinking/reasoning XML blocks
+    text = re.sub(r'<(?:think|thought)\b[^>]*>.*?</(?:think|thought)>', '', text, flags=re.DOTALL | re.IGNORECASE)
+    text = re.sub(r'<(?:think|thought)\b[^>]*>.*', '', text, flags=re.DOTALL | re.IGNORECASE)
+
     # Remove markdown code block markers
     text = re.sub(r'```html\s*', '', text)
     text = re.sub(r'```\s*', '', text)
+
+    # Strip stray article/card prefixes (e.g., "Card 1:", "Card 2:", "Article 1:")
+    text = re.sub(r'(?i)\b(?:card|editorial|article)\s+\d+:\s*', '', text)
 
     # Remove instructions blocks that LLMs sometimes output in the middle or end (run first while raw markdown is intact)
     text = re.sub(r'[ \t]*--- \*\*TO PROCESS OTHER UNITS.*?(?:Here is the transformed content\.\.\.\s*---[ \t]*|[ \t]*---[ \t]*)', '', text, flags=re.DOTALL | re.IGNORECASE)
@@ -294,13 +301,20 @@ def clean_html_fragment(text: str) -> str:
     text = re.sub(r'<(h[1-6])>(.*?)</\1>\s*<(h[1-6])>(.*?)</\3>', remove_duplicate_headings, text, flags=re.DOTALL | re.IGNORECASE)
 
     # AGGRESSIVE LEADING TEXT REMOVAL:
-    # Find the first HTML tag and remove everything before it
-    first_tag = re.search(r'<(?:h[1-6]|div|p|table|ul|ol|section|article)', text, re.IGNORECASE)
-    if first_tag:
-        leading_text = text[:first_tag.start()]
-        # If leading text contains a closing tag, we are in the middle of a block; do not strip.
-        if '</' not in leading_text:
-            text = text[first_tag.start():]
+    # If brief-card exists and no closing tag precedes it, strip scratchpad before it
+    brief_card_match = re.search(r'<div\s+class=["\']brief-card["\']', text, re.IGNORECASE)
+    if brief_card_match:
+        leading = text[:brief_card_match.start()]
+        if '</' not in leading:
+            text = text[brief_card_match.start():]
+    else:
+        # Fallback to any structural HTML tag
+        first_tag = re.search(r'<(?:h[1-6]|div|p|table|ul|ol|section|article)', text, re.IGNORECASE)
+        if first_tag:
+            leading_text = text[:first_tag.start()]
+            # If leading text contains a closing tag, we are in the middle of a block; do not strip.
+            if '</' not in leading_text:
+                text = text[first_tag.start():]
 
     # AGGRESSIVE TRAILING TEXT REMOVAL:
     # Find the last closing HTML tag and remove everything after it
@@ -439,12 +453,13 @@ def _inject_anchors_and_back_buttons(html: str, batch_units: list[dict]) -> str:
                     curr = next_sib
                 parent_card = card
 
-            # 3. Add the back-to-revision button running element inside the parent_card
-            back_container = soup.new_tag("div", **{"class": "back-to-rev-container"})
-            back_btn = soup.new_tag("a", href=f"#rev_{unit_id}", **{"class": "back-to-revision-btn"})
-            back_btn.string = "Back to Revision Sheet"
-            back_container.append(back_btn)
-            parent_card.append(back_container)
+            # 3. Add the back-to-revision button running element inside the parent_card if not already present
+            if not parent_card.find("div", class_="back-to-rev-container"):
+                back_container = soup.new_tag("div", **{"class": "back-to-rev-container"})
+                back_btn = soup.new_tag("a", href=f"#rev_{unit_id}", **{"class": "back-to-revision-btn"})
+                back_btn.string = "Back to Revision Sheet"
+                back_container.append(back_btn)
+                parent_card.append(back_container)
 
         return str(soup)
     except Exception as e:

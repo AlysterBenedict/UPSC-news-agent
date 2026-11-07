@@ -112,7 +112,7 @@ Packages the desktop app for simple deployment.
 | Component        | Technology                                       |
 |------------------|--------------------------------------------------|
 | **Orchestration** | LangGraph (Stateful graph with SQLite checkpointer) |
-| **LLM Inference** | NVIDIA NIM API (`nvidia/nemotron-3-super-120b-a12b` & `nvidia/nemotron-3.5-lightning-30b-a3b`) |
+| **LLM Inference** | NVIDIA NIM API (`nvidia/nemotron-3-ultra-550b-a55b`) |
 | **Local Embeddings** | Sentence-Transformers (`all-MiniLM-L6-v2`)     |
 | **Clustering**   | Scikit-Learn `AgglomerativeClustering`          |
 | **Validation**   | Pydantic v2                                      |

@@ -25,7 +25,7 @@ class LLMClient:
         self,
         api_key: str,
         base_url: str = "https://integrate.api.nvidia.com/v1",
-        model: str = "nvidia/nemotron-3-super-120b-a12b",
+        model: str = "nvidia/nemotron-3-ultra-550b-a55b",
         max_retries: int = 3,
         timeout: int = 120,
         delay: float = 1.0,
@@ -79,6 +79,9 @@ class LLMClient:
 
                 msg = response.choices[0].message
                 content = msg.content or getattr(msg, "reasoning_content", None) or getattr(msg, "reasoning", None) or ""
+                # Strip thinking/reasoning XML blocks if present
+                import re
+                content = re.sub(r'<(?:think|thought)\b[^>]*>.*?</(?:think|thought)>', '', content, flags=re.DOTALL | re.IGNORECASE).strip()
                 log.info(
                     "llm_call_success",
                     attempt=attempt,

@@ -42,7 +42,10 @@ jobs:
           # NVIDIA NIM API Settings
           NIM_API_KEY: ${{ secrets.NIM_API_KEY }}
           NIM_BASE_URL: https://integrate.api.nvidia.com/v1
-          NIM_MODEL: nvidia/llama-3.3-nemotron-super-49b-v1
+          NIM_MODEL: nvidia/nemotron-3-ultra-550b-a55b
+          NIM_MODEL_FAST: nvidia/nemotron-3-ultra-550b-a55b
+          NIM_MODEL_CLASSIFIER: nvidia/nemotron-3-ultra-550b-a55b
+          WRITER_BATCH_SIZE: 3
 
           # Email/SMTP Settings
           SMTP_HOST: smtp.gmail.com
