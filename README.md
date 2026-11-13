@@ -203,6 +203,11 @@ Fill in the configuration details:
   python main.py run
   ```
 
+* **Run locally without sending email to subscribers:**
+  ```bash
+  python main.py run --local-only
+  ```
+
 * **Run the pipeline for a specific date:**
   ```bash
   python main.py run --date 2026-06-14
